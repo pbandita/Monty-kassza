@@ -9,13 +9,13 @@ import urllib.parse
 st.set_page_config(page_title="Andris & Zsóka Kassza", layout="wide", page_icon="💰")
 px.defaults.template = "plotly_dark"
 
-# Google Táblázat CSV elérése (Olvasáshoz)
+# Google Táblázat adatok
 SHEET_ID = "1sk5Lg03WHEq-EtSrK9xSrtAwNAX4fh0_KULE37DraIQ"
 CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
-# A TE APPS SCRIPT URL-ED (Íráshoz)
-SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVwCzkVtBBksB81JOA_CAgfWEgO1xIEsVxTd4rZAPmSgTTJuORLCdLM8xyiR4lDKYQ2A/exec""
+# A Google Apps Script URL-ed (idézőjel javítva)
+SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyHCbk2E4E01AQflCl4K9qYH-GXPSuzHHU0yMS7XhATHkBnb7Gy87EFcdGDrAmrnU68w/exec"
 
-# --- 1. ADATOK BETÖLTÉSE ---
+# --- 1. ADATOK BETÖLTÉSE ÉS ÁRFOLYAM ---
 def load_data():
     try:
         df = pd.read_csv(CSV_URL)
@@ -68,41 +68,42 @@ with tab1:
         try:
             res = requests.post(SCRIPT_URL, json=uj_adat)
             if res.status_code == 200:
-                st.success(f"✅ Mentve: {final_osszeg:,.0f} Ft")
+                st.success(f"✅ Mentve a Google Táblázatba: {final_osszeg:,.0f} Ft")
                 st.balloons()
-                st.info("Frissítsd az oldalt a grafikonokhoz!")
+            else:
+                st.error("Hiba történt a küldéskor. Ellenőrizd a Script beállításait!")
         except:
-            st.error("Hiba a mentés során!")
+            st.error("Nem sikerült elérni a mentési szolgáltatást.")
 
 with tab2:
     st.subheader("📊 Kimutatások")
     if not df.empty:
-        # Időalapú szűréshez
         df['datum'] = pd.to_datetime(df['datum'])
         df['Honap'] = df['datum'].dt.strftime('%Y-%m')
         
-        c1, c2, c3 = st.columns(3)
+        # Főbb számok
         kiadas_df = df[df['tipus'].str.contains("Kiadás", na=False)]
         bevetel_sum = df[df['tipus'].str.contains("Bevétel", na=False)]['osszeg'].sum()
         kiadas_sum = kiadas_df['osszeg'].sum()
         
+        c1, c2, c3 = st.columns(3)
         c1.metric("Összes Bevétel", f"{bevetel_sum:,.0f} Ft")
         c2.metric("Összes Kiadás", f"{kiadas_sum:,.0f} Ft")
         c3.metric("Egyenleg", f"{(bevetel_sum - kiadas_sum):,.0f} Ft")
 
         col_g1, col_g2 = st.columns(2)
         with col_g1:
-            st.write("🍕 **Kiadások aránya**")
+            st.write("🍕 **Kiadások megoszlása**")
             fig_pie = px.pie(kiadas_df, values='osszeg', names='kategoria', hole=0.4)
             st.plotly_chart(fig_pie, use_container_width=True)
         
         with col_g2:
-            st.write("📈 **Havi trendek kategóriánként**")
+            st.write("📈 **Havi költési trendek**")
             trend_data = kiadas_df.groupby(['Honap', 'kategoria'])['osszeg'].sum().reset_index()
             fig_line = px.line(trend_data, x="Honap", y="osszeg", color="kategoria", markers=True)
             st.plotly_chart(fig_line, use_container_width=True)
     else:
-        st.info("Még nincsenek adatok a statisztikához.")
+        st.info("Még nincsenek adatok. Tölts fel egy tételt!")
 
 with tab3:
     st.subheader("📅 Naptár és Fixek")
@@ -112,7 +113,7 @@ with tab3:
     ma = datetime.now()
     e_havi = df[(pd.to_datetime(df['datum']).dt.month == ma.month)] if not df.empty else pd.DataFrame()
     
-    st.write(f"**{ma.strftime('%Y. %B')}** fix tételek állapota:")
+    st.write(f"**{ma.strftime('%Y. %B')}** havi fixek:")
     cols = st.columns(len(fix_lista))
     for i, fix in enumerate(fix_lista):
         pipa = any(e_havi['megjegyzes'].str.contains(fix, case=False, na=False)) if not e_havi.empty else False
@@ -121,11 +122,10 @@ with tab3:
     
     st.divider()
     
-    # EGYSZERŰSÍTETT NAPTÁR LISTA
-    st.write("📅 **Időrendi áttekintés**")
+    # IDŐRENDI LISTA
+    st.write("📋 **Utolsó 10 bejegyzés**")
     if not df.empty:
-        df_sorted = df.sort_values('datum', ascending=False)
-        for _, sor in df_sorted.head(10).iterrows():
-            st.text(f"{sor['datum'].strftime('%m.%d')} | {sor['osszeg']:,.0f} Ft | {sor['kategoria']} ({sor['megjegyzes']})")
+        df_sorted = df.sort_values('datum', ascending=False).head(10)
+        st.table(df_sorted[['datum', 'kategoria', 'osszeg', 'szemely', 'megjegyzes']])
     else:
-        st.write("A táblázat üres.")
+        st.write("Nincs megjeleníthető adat.")
