@@ -4,48 +4,40 @@ import plotly.express as px
 import requests
 from datetime import datetime
 
-# --- ALAPBEÁLLÍTÁSOK ---
+# --- BEÁLLÍTÁSOK ---
 st.set_page_config(page_title="Monty Kassza", layout="wide", page_icon="🐾")
 
-# A te táblázatod adatai
 SHEET_ID = "1sk5Lg03WHEq-EtSrK9xSrtAwNAX4fh0_KULE37DraIQ"
-# Ez a link közvetlenül CSV-ként hívja le az adatokat
 CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 
 # --- ADATOK BETÖLTÉSE ---
 def load_data():
     try:
-        # Közvetlen beolvasás a Google-ből, cache nélkül, hogy mindig friss legyen
+        # Közvetlen olvasás a Google-ből
         df = pd.read_csv(CSV_URL)
-        # Dátum formátum javítása
         if 'datum' in df.columns:
             df['datum'] = pd.to_datetime(df['datum']).dt.date
         return df
-    except Exception as e:
-        st.error(f"Hiba az adatok beolvasásakor: {e}")
+    except:
         return pd.DataFrame(columns=["datum", "tipus", "szemely", "kategoria", "osszeg", "megjegyzes"])
 
-# --- ÁRFOLYAM ---
 @st.cache_data(ttl=3600)
 def get_eur_huf():
     try:
         r = requests.get("https://open.er-api.com/v6/latest/EUR")
         return r.json()['rates']['HUF']
-    except:
-        return 410.0
+    except: return 410.0
 
 arfolyam = get_eur_huf()
+df = load_data()
 
 # --- MEGJELENÍTÉS ---
-st.title("🐾 Monty Kassza - Andris & Zsóka")
+st.title("🐾 Monty Kassza")
 
-tab1, tab2, tab3 = st.tabs(["📊 Statisztika", "📝 Új tétel", "📅 Összes adat"])
-
-df = load_data()
+tab1, tab2, tab3 = st.tabs(["📊 Statisztika", "📝 Új tétel", "📅 Adatok"])
 
 with tab1:
     if not df.empty:
-        # Gyors mérőszámok
         kiadas_sum = df[df['tipus'].str.contains("Kiadás", na=False)]['osszeg'].sum()
         bevetel_sum = df[df['tipus'].str.contains("Bevétel", na=False)]['osszeg'].sum()
         
@@ -53,19 +45,15 @@ with tab1:
         c1.metric("Összes kiadás", f"{kiadas_sum:,.0f} Ft")
         c2.metric("Összes bevétel", f"{bevetel_sum:,.0f} Ft")
         
-        # Grafikon
         if kiadas_sum > 0:
             fig = px.pie(df[df['tipus'].str.contains("Kiadás", na=False)], 
-                         values='osszeg', names='kategoria', 
-                         title="Kiadások megoszlása", hole=0.4)
+                         values='osszeg', names='kategoria', hole=0.4)
             st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("Még nincsenek adatok a táblázatban.")
+        st.info("Még nincsenek adatok a Google Táblázatban.")
 
 with tab2:
-    st.subheader("💰 Új tranzakció rögzítése")
-    st.write(f"ℹ️ Aktuális árfolyam: 1 EUR = {arfolyam:.1f} HUF")
-    
+    st.subheader("💰 Új rögzítés")
     with st.form("adat_form", clear_on_submit=True):
         col1, col2 = st.columns(2)
         with col1:
@@ -73,4 +61,19 @@ with tab2:
             t = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel"])
             s = st.selectbox("Ki?", ["👤 Andris", "👤 Zsóka", "👥 Közös"])
         with col2:
-            k = st.
+            k = st.selectbox("Kategória", ["🏠 Lakás", "🛒 Élelmiszer", "🚗 Autó", "🎬 Hobbi", "🐶 Monty", "📦 Egyéb"])
+            v = st.radio("Pénznem", ["HUF", "EUR"], horizontal=True)
+            o = st.number_input("Összeg", min_value=0.0)
+            
+        m = st.text_input("Megjegyzés")
+        submit = st.form_submit_button("Mentés")
+        
+        if submit:
+            final_o = o if v == "HUF" else o * arfolyam
+            # Ez egy trükk: generálunk egy linket, amivel csak rá kell kattintani a mentéshez
+            st.success(f"Adat előkészítve: {final_o:,.0f} Ft")
+            st.info("Kattints a lenti gombra a Google Táblázatba íráshoz:")
+            st.link_button("🚀 Végleges Mentés (Google Forms)", "https://docs.google.com/forms/d/e/IDE_JÖN_MAJD_A_FORMS_LINK/viewform")
+
+with tab3:
+    st.dataframe(df, use_container_width=True)
