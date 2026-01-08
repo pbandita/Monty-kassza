@@ -5,67 +5,48 @@ from datetime import datetime
 import plotly.express as px
 import requests
 
-# --- ÁRFOLYAM LEKÉRÉS ---
+# --- ÁRFOLYAM ---
 def get_eur_huf():
     try:
         url = "https://open.er-api.com/v6/latest/EUR"
-        response = requests.get(url).json()
-        return response['rates']['HUF']
-    except:
-        return 400.0
+        return requests.get(url).json()['rates']['HUF']
+    except: return 400.0
 
-# --- KONNEKCIÓ LÉTREHOZÁSA ---
-conn = st.connection("gsheets", type=GSheetsConnection)
-
-def get_data():
-    # Ez a módszer közvetlenül a CSV export linket hívja meg
-    sheet_id = "1sk5Lg03WHEq-EtSrK9xSrtAwNAX4fh0_KULE37DraIQ"
-    url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
-    try:
-        return pd.read_csv(url)
-    except:
-        return pd.DataFrame(columns=["datum", "tipus", "szemely", "kategoria", "osszeg", "megjegyzes"])
-# --- BEÁLLÍTÁSOK ---
-st.set_page_config(page_title="Andris & Zsóka Kassza", layout="wide")
-px.defaults.template = "plotly_dark"
+st.set_page_config(page_title="Monty Kassza", layout="wide")
 arfolyam = get_eur_huf()
 
-tab1, tab2 = st.tabs(["📝 Könyvelés", "📊 Kimutatások"])
+# --- ADATOK ---
+conn = st.connection("gsheets", type=GSheetsConnection)
+def get_data():
+    return conn.read(ttl="0m")
+
+# --- FELÜLET ---
+tab1, tab2, tab3 = st.tabs(["📝 Bevitel", "📊 Statisztika", "📅 Lista"])
 
 with tab1:
-    st.subheader("💸 Új tétel rögzítése")
-    with st.form("beviteli_iv", clear_on_submit=True):
-        col1, col2 = st.columns(2)
-        with col1:
-            datum = st.date_input("Dátum", datetime.now())
-            tipus = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel", "💰 Megtakarítás"])
-            szemely = st.selectbox("Ki rögzítette?", ["👤 Andris", "👤 Zsóka", "👥 Közös"])
-        with col2:
-            kategoria = st.selectbox("Kategória", ["🏠 Lakás", "🛒 Élelmiszer", "🏦 Hitel", "🚗 Autó", "🎬 Hobbi", "📦 Egyéb"])
-            valuta = st.radio("Pénznem", ["HUF", "EUR"], horizontal=True)
-            osszeg = st.number_input("Összeg", min_value=0.0)
-            
-        megjegyzes = st.text_input("Megjegyzés")
-        mentes = st.form_submit_button("💾 Mentés")
-
-    if mentes and osszeg > 0:
-        final_osszeg = osszeg if valuta == "HUF" else osszeg * arfolyam
-        uj_adat = pd.DataFrame([{
-            "datum": datum.strftime("%Y-%m-%d"),
-            "tipus": tipus,
-            "szemely": szemely,
-            "kategoria": kategoria,
-            "osszeg": final_osszeg,
-            "megjegyzes": f"{megjegyzes} [EUR: {osszeg}]" if valuta == "EUR" else megjegyzes
-        }])
-        
-        regi_adatok = get_data()
-        friss_df = pd.concat([regi_adatok, uj_adat], ignore_index=True)
-        conn.update(data=friss_df)
-        st.success("Adat elküldve a Google Táblázatba!")
+    st.subheader("💸 Új tétel")
+    with st.form("add_form", clear_on_submit=True):
+        d = st.date_input("Dátum", datetime.now())
+        t = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel"])
+        s = st.selectbox("Ki?", ["👤 Andris", "👤 Zsóka", "👥 Közös"])
+        k = st.selectbox("Kategória", ["🏠 Lakás", "🛒 Élelmiszer", "🚗 Autó", "🎬 Hobbi", "🐶 Monty", "📦 Egyéb"])
+        val = st.radio("Pénznem", ["HUF", "EUR"], horizontal=True)
+        osszeg = st.number_input("Összeg", min_value=0.0)
+        megj = st.text_input("Megjegyzés")
+        if st.form_submit_button("Mentés"):
+            final_o = osszeg if val == "HUF" else osszeg * arfolyam
+            uj = pd.DataFrame([{"datum": d.strftime("%Y-%m-%d"), "tipus": t, "szemely": s, "kategoria": k, "osszeg": final_o, "megjegyzes": megj}])
+            df = pd.concat([get_data(), uj], ignore_index=True)
+            conn.update(data=df)
+            st.success("Mentve a Google Táblázatba!")
 
 with tab2:
     df = get_data()
     if not df.empty:
+        st.plotly_chart(px.pie(df[df['tipus']=='📉 Kiadás'], values='osszeg', names='kategoria', title="Kiadások megoszlása"))
+        st.metric("Összes kiadás", f"{df[df['tipus']=='📉 Kiadás']['osszeg'].sum():,.0f} Ft")
+
+with tab3:
+    df = get_data()
+    if not df.empty:
         st.dataframe(df.sort_values("datum", ascending=False), use_container_width=True)
-        st.metric("Összes kiadás", f"{df[df['tipus'] == '📉 Kiadás']['osszeg'].sum():,.0f} Ft")
