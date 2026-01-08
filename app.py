@@ -31,9 +31,31 @@ if mentes and nyers_osszeg > 0:
     final_osszeg = nyers_osszeg if valuta == "HUF" else nyers_osszeg * get_eur_huf()
     
     # --- GOOGLE FORM ELÉRÉSI KÓD ÉS AUTOMATIZÁLÁS ---
-    # Ide másold az alap linkedet (viewform-ig)
-    base_url = "https://docs.google.com/spreadsheets/d/AKfycbzVwCzkVtBBksB81JOA_CAgfWEgO1xIEsVxTd4rZAPmSgTTJuORLCdLM8xyiR4lDKYQ2A/viewform"
+   if mentes and nyers_osszeg > 0:
+    final_osszeg = nyers_osszeg if valuta == "HUF" else nyers_osszeg * arfolyam
     
+    # ADATOK ÖSSZEKÉSZÍTÉSE
+    uj_adat = {
+        "datum": datum.strftime("%Y-%m-%d"),
+        "tipus": tipus,
+        "szemely": szemely,
+        "kategoria": kategoria,
+        "osszeg": int(final_osszeg),
+        "megjegyzes": megjegyzes
+    }
+
+    # KÜLDÉS A SCRIPTNEK
+    SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVwCzkVtBBksB81JOA_CAgfWEgO1xIEsVxTd4rZAPmSgTTJuORLCdLM8xyiR4lDKYQ2A/exec"
+    
+    try:
+        response = requests.post(SCRIPT_URL, json=uj_adat)
+        if response.status_code == 200:
+            st.success(f"✅ Sikeresen mentve a táblázatba: {final_osszeg:,.0f} Ft")
+            st.balloons() # Egy kis ünneplés Zsókának és neked :)
+        else:
+            st.error("Hiba történt a küldéskor.")
+    except Exception as e:
+        st.error(f"Nem sikerült elérni a Google-t: {e}")
     # Ide írd be az entry kódokat, amiket a pre-filled linkből látsz
     params = {
         "entry.12345678": datum.strftime("%Y-%m-%d"),
