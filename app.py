@@ -18,7 +18,7 @@ def get_eur_huf():
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 def get_data():
-    return conn.read(worksheet="Munkalap1",ttl="0m") # Friss adatok olvasása
+    return conn.read(worksheet="Munkalap1", ttl="0m") # Friss adatok olvasása
 
 # --- BEÁLLÍTÁSOK ---
 st.set_page_config(page_title="Andris & Zsóka Kassza", layout="wide")
