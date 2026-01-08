@@ -18,8 +18,13 @@ def get_eur_huf():
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 def get_data():
-    return conn.read(worksheet="Munkalap1", ttl="0m") # Friss adatok olvasása
-
+    # Ez a módszer közvetlenül a CSV export linket hívja meg
+    sheet_id = "1sk5Lg03WHEq-EtSrK9xSrtAwNAX4fh0_KULE37DraIQ"
+    url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
+    try:
+        return pd.read_csv(url)
+    except:
+        return pd.DataFrame(columns=["datum", "tipus", "szemely", "kategoria", "osszeg", "megjegyzes"])
 # --- BEÁLLÍTÁSOK ---
 st.set_page_config(page_title="Andris & Zsóka Kassza", layout="wide")
 px.defaults.template = "plotly_dark"
