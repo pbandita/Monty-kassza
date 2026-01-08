@@ -9,7 +9,7 @@ st.set_page_config(page_title="Monty Kassza", layout="wide", page_icon="💸")
 
 # Táblázat adatai
 SHEET_ID = "1sk5Lg03WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ"
-CSV_URL = f"https://docs.google.com/spreadsheets/d/1sk5LgO3WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ/edit?gid=0#gid=0/export?format=csv"
+CSV_URL = f"https://docs.google.com/spreadsheets/d/1sk5LgO3WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ/export?format=csv"
 
 # --- FIX KIADÁSOK LISTÁJA ---
 # Ide írd be a havi fixeket, amiket ellenőrizni akartok
