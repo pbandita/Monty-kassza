@@ -5,16 +5,19 @@ import requests
 from datetime import datetime
 
 # --- BEÁLLÍTÁSOK ---
-st.set_page_config(page_title="Monty Kassza", layout="wide", page_icon="🐾")
+st.set_page_config(page_title="Monty Kassza", layout="wide", page_icon="💸")
 
 # Táblázat adatai
-SHEET_ID = "1sk5Lg03WHEq-EtSrK9xSrtAwNAX4fh0_KULE37DraIQ"
-CSV_URL = f"https://docs.google.com/spreadsheets/d/1sk5LgO3WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ/export?format=csv"
+SHEET_ID = "1sk5Lg03WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ"
+CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
+
+# --- FIX KIADÁSOK LISTÁJA ---
+# Ide írd be a havi fixeket, amiket ellenőrizni akartok
+FIX_KIADASOK = ["Lakbér", "Közös költség", "Internet/TV", "Netflix", "Spotify", "Villany"]
 
 # --- ADATOK BETÖLTÉSE ---
 def load_data():
     try:
-        # A 'storage_options' segít elkerülni a cache-elési hibákat
         df = pd.read_csv(CSV_URL)
         if 'datum' in df.columns:
             df['datum'] = pd.to_datetime(df['datum']).dt.date
@@ -22,7 +25,7 @@ def load_data():
     except:
         return pd.DataFrame(columns=["datum", "tipus", "szemely", "kategoria", "osszeg", "megjegyzes"])
 
-@st.cache_data(ttl=600) # 10 percenként frissülő árfolyam
+@st.cache_data(ttl=3600)
 def get_eur_huf():
     try:
         r = requests.get("https://open.er-api.com/v6/latest/EUR")
@@ -33,67 +36,67 @@ arfolyam = get_eur_huf()
 df = load_data()
 
 # --- MEGJELENÍTÉS ---
-st.title("🐾 Monty Kassza - Pénzügyi Áttekintés")
+st.title("💸 Monty Kassza")
 
-# Oldalsáv a gyors infóknak
-with st.sidebar:
-    st.header("⚙️ Beállítások")
-    st.write(f"💱 **Árfolyam:** 1 EUR = {arfolyam:.1f} Ft")
-    if st.button("🔄 Adatok frissítése"):
-        st.cache_data.clear()
-        st.rerun()
-
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Statisztika", "📝 Új tétel", "📅 Idővonal", "🐕 Monty"])
+tab1, tab2, tab3 = st.tabs(["📊 Statisztika", "📝 Új tétel", "📅 Fix kiadások & Adatok"])
 
 with tab1:
     if not df.empty:
-        # Számítások
         kiadasok = df[df['tipus'].str.contains("Kiadás", na=False)]
-        bevetel_sum = df[df['tipus'].str.contains("Bevétel", na=False)]['osszeg'].sum()
         kiadas_sum = kiadasok['osszeg'].sum()
-        egyenleg = bevetel_sum - kiadas_sum
-
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Bevétel", f"{bevetel_sum:,.0f} Ft", delta_color="normal")
-        col2.metric("Kiadás", f"{kiadas_sum:,.0f} Ft", delta_color="inverse")
-        col3.metric("Egyenleg", f"{egyenleg:,.0f} Ft", delta="Aktuális")
-
-        # Kategória szerinti bontás
-        st.subheader("🍕 Mire ment el a pénz?")
+        bevetel_sum = df[df['tipus'].str.contains("Bevétel", na=False)]['osszeg'].sum()
+        
+        c1, c2 = st.columns(2)
+        c1.metric("Összes kiadás (HUF)", f"{kiadas_sum:,.0f} Ft")
+        c2.metric("Összes bevétel (HUF)", f"{bevetel_sum:,.0f} Ft")
+        
         fig = px.bar(kiadasok.groupby('kategoria')['osszeg'].sum().reset_index(), 
-                     x='kategoria', y='osszeg', color='kategoria',
-                     text_auto='.2s', title="Kiadások kategóriánként")
+                     x='kategoria', y='osszeg', color='kategoria', title="Kiadások megoszlása")
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning("Nincs megjeleníthető adat. Írj be valamit a táblázatba!")
+        st.info("Még nincsenek adatok a táblázatban.")
 
 with tab2:
-    st.subheader("📝 Új tranzakció rögzítése")
-    # Itt marad a Forms-os megoldás vagy egy manuális emlékeztető
-    with st.form("bevitel"):
-        c1, c2 = st.columns(2)
-        with c1:
-            datum = st.date_input("Dátum", datetime.now())
-            tipus = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel", "💰 Megtakarítás"])
-            szemely = st.selectbox("Ki?", ["👤 Andris", "👤 Zsóka", "👥 Közös"])
-        with c2:
-            kat = st.selectbox("Kategória", ["🏠 Lakás", "🛒 Élelmiszer", "🚗 Autó", "🎬 Hobbi", "🐶 Monty", "📦 Egyéb"])
-            penznem = st.radio("Pénznem", ["HUF", "EUR"], horizontal=True)
-            osszeg = st.number_input("Összeg", min_value=0)
-        
-        megj = st.text_input("Megjegyzés (pl. bolt neve)")
+    st.subheader("Új tranzakció rögzítése")
+    st.write(f"ℹ️ Aktuális árfolyam: 1 EUR = {arfolyam:.1f} HUF")
+    
+    with st.form("adat_form", clear_on_submit=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            d = st.date_input("Dátum", datetime.now())
+            t = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel"])
+            s = st.selectbox("Ki?", ["👤 Andris", "👤 Zsóka", "👥 Közös"])
+        with col2:
+            k = st.selectbox("Kategória", ["🏠 Lakás", "🛒 Élelmiszer", "🚗 Autó", "🎬 Hobbi", "📦 Egyéb"])
+            v = st.radio("Pénznem", ["HUF", "EUR"], horizontal=True)
+            o = st.number_input("Összeg", min_value=0.0)
+            
+        m = st.text_input("Megjegyzés (pl. Netflix)")
         
         if st.form_submit_button("Adat rögzítése"):
-            # Itt irányítunk a Google Formhoz, amit korábban készítettél
-            st.info("Kattints a mentéshez a Google Forms linkre!")
-            st.link_button("🚀 IRÁNY A GOOGLE FORMS", "IDE_MÁSOLD_A_FORMS_LINKET")
+            st.info("Kattints a Google Forms linkre a mentéshez!")
+            st.link_button("🚀 IRÁNY A MENTÉS", "https://docs.google.com/forms/d/e/A_TE_FORMS_KODOD/viewform")
 
 with tab3:
-    st.subheader("📅 Tranzakciók listája")
-    st.dataframe(df.sort_values(by='datum', ascending=False), use_container_width=True)
-
-with tab4:
-    st.subheader("🐶 Monty különkiadás")
-    monty_costs = df[df['kategoria'] == "🐶 Monty"]['osszeg'].sum()
-    st.metric("Monty összes költsége eddig", f"{monty_costs:,.0f} Ft")
-    st.write("Itt követhetitek, mennyit költötök a kutyusra (táp, állatorvos, játékok).")
+    st.subheader("📌 Havi fix kiadások ellenőrzése")
+    # Megnézzük az aktuális hónapban mi lett már kifizetve
+    ma = datetime.now()
+    if not df.empty:
+        df['datum'] = pd.to_datetime(df['datum'])
+        e_havi = df[(df['datum'].dt.month == ma.month) & (df['datum'].dt.year == ma.year)]
+        
+        # Ellenőrző lista
+        cols = st.columns(len(FIX_KIADASOK))
+        for i, fix in enumerate(FIX_KIADASOK):
+            # Megnézzük a megjegyzésben vagy kategóriában szerepel-e a fix kiadás neve
+            pipa = any(e_havi['megjegyzes'].str.contains(fix, case=False, na=False)) or \
+                   any(e_havi['kategoria'].str.contains(fix, case=False, na=False))
+            
+            if pipa:
+                cols[i].success(f"✅ {fix}")
+            else:
+                cols[i].error(f"❌ {fix}")
+    
+    st.divider()
+    st.subheader("📋 Összes tranzakció")
+    st.dataframe(df.sort_values(by="datum", ascending=False), use_container_width=True)
