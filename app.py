@@ -1,102 +1,59 @@
 import streamlit as st
+import sqlite3
 import pandas as pd
+from datetime import datetime, timedelta
 import plotly.express as px
 import requests
-from datetime import datetime
+import urllib.parse # ÚJ: A link kódolásához
 
-# --- BEÁLLÍTÁSOK ---
-st.set_page_config(page_title="Monty Kassza", layout="wide", page_icon="💸")
-
-# Táblázat adatai
-SHEET_ID = "1sk5Lg03WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ"
-CSV_URL = f"https://docs.google.com/spreadsheets/d/1sk5LgO3WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ/export?format=csv"
-
-# --- FIX KIADÁSOK LISTÁJA ---
-# Ide írd be a havi fixeket, amiket ellenőrizni akartok
-FIX_KIADASOK = ["Lakbér", "Közös költség", "Internet/TV", "Netflix", "Spotify", "Villany"]
-
-# --- ADATOK BETÖLTÉSE ---
-def load_data():
-    try:
-        df = pd.read_csv(CSV_URL)
-        if 'datum' in df.columns:
-            df['datum'] = pd.to_datetime(df['datum']).dt.date
-        return df
-    except:
-        return pd.DataFrame(columns=["datum", "tipus", "szemely", "kategoria", "osszeg", "megjegyzes"])
-
-@st.cache_data(ttl=3600)
+# --- ÁRFOLYAM ÉS ADATBÁZIS (VÁLTOZATLAN) ---
 def get_eur_huf():
     try:
-        r = requests.get("https://open.er-api.com/v6/latest/EUR")
-        return r.json()['rates']['HUF']
-    except: return 410.0
+        url = "https://open.er-api.com/v6/latest/EUR"
+        return requests.get(url).json()['rates']['HUF']
+    except: return 400.0
 
-arfolyam = get_eur_huf()
-df = load_data()
-
-# --- MEGJELENÍTÉS ---
-st.title("💸 Monty Kassza")
-
-tab1, tab2, tab3 = st.tabs(["📊 Statisztika", "📝 Új tétel", "📅 Fix kiadások & Adatok"])
-
-with tab1:
-    if not df.empty:
-        kiadasok = df[df['tipus'].str.contains("Kiadás", na=False)]
-        kiadas_sum = kiadasok['osszeg'].sum()
-        bevetel_sum = df[df['tipus'].str.contains("Bevétel", na=False)]['osszeg'].sum()
-        
-        c1, c2 = st.columns(2)
-        c1.metric("Összes kiadás (HUF)", f"{kiadas_sum:,.0f} Ft")
-        c2.metric("Összes bevétel (HUF)", f"{bevetel_sum:,.0f} Ft")
-        
-        fig = px.bar(kiadasok.groupby('kategoria')['osszeg'].sum().reset_index(), 
-                     x='kategoria', y='osszeg', color='kategoria', title="Kiadások megoszlása")
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.info("Még nincsenek adatok a táblázatban.")
-
-with tab2:
-    st.subheader("Új tranzakció rögzítése")
-    st.write(f"ℹ️ Aktuális árfolyam: 1 EUR = {arfolyam:.1f} HUF")
+# --- FORMÁZOTT MENTÉS GOMB ---
+with st.form("beviteli_iv", clear_on_submit=True):
+    datum = st.date_input("Dátum", datetime.now())
+    tipus = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel", "💰 Megtakarítás"])
+    szemely = st.selectbox("Ki rögzítette?", ["👤 Andris", "👤 Zsóka", "👥 Közös"])
+    kategoria = st.selectbox("Kategória", ["🏠 Lakás/Rezsi", "🛒 Élelmiszer", "🚗 Közlekedés", "🐶 Monty", "📦 Egyéb"])
     
-    with st.form("adat_form", clear_on_submit=True):
-        col1, col2 = st.columns(2)
-        with col1:
-            d = st.date_input("Dátum", datetime.now())
-            t = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel"])
-            s = st.selectbox("Ki?", ["👤 Andris", "👤 Zsóka", "👥 Közös"])
-        with col2:
-            k = st.selectbox("Kategória", ["🏠 Lakás", "🛒 Élelmiszer", "🚗 Autó", "🎬 Hobbi", "📦 Egyéb"])
-            v = st.radio("Pénznem", ["HUF", "EUR"], horizontal=True)
-            o = st.number_input("Összeg", min_value=0.0)
-            
-        m = st.text_input("Megjegyzés (pl. Netflix)")
-        
-        if st.form_submit_button("Adat rögzítése"):
-            st.info("Kattints a Google Forms linkre a mentéshez!")
-            st.link_button("🚀 IRÁNY A MENTÉS", "https://docs.google.com/forms/d/e/A_TE_FORMS_KODOD/viewform")
-
-with tab3:
-    st.subheader("📌 Havi fix kiadások ellenőrzése")
-    # Megnézzük az aktuális hónapban mi lett már kifizetve
-    ma = datetime.now()
-    if not df.empty:
-        df['datum'] = pd.to_datetime(df['datum'])
-        e_havi = df[(df['datum'].dt.month == ma.month) & (df['datum'].dt.year == ma.year)]
-        
-        # Ellenőrző lista
-        cols = st.columns(len(FIX_KIADASOK))
-        for i, fix in enumerate(FIX_KIADASOK):
-            # Megnézzük a megjegyzésben vagy kategóriában szerepel-e a fix kiadás neve
-            pipa = any(e_havi['megjegyzes'].str.contains(fix, case=False, na=False)) or \
-                   any(e_havi['kategoria'].str.contains(fix, case=False, na=False))
-            
-            if pipa:
-                cols[i].success(f"✅ {fix}")
-            else:
-                cols[i].error(f"❌ {fix}")
+    c_p1, c_p2 = st.columns([1, 3])
+    valuta = c_p1.selectbox("Pénznem", ["HUF", "EUR"])
+    nyers_osszeg = c_p2.number_input("Összeg", min_value=0.0, step=10.0)
     
-    st.divider()
-    st.subheader("📋 Összes tranzakció")
-    st.dataframe(df.sort_values(by="datum", ascending=False), use_container_width=True)
+    megjegyzes = st.text_input("Megjegyzés")
+    mentes = st.form_submit_button("💾 Adat előkészítése", use_container_width=True)
+
+if mentes and nyers_osszeg > 0:
+    final_osszeg = nyers_osszeg if valuta == "HUF" else nyers_osszeg * get_eur_huf()
+    
+    # --- GOOGLE FORM ELÉRÉSI KÓD ÉS AUTOMATIZÁLÁS ---
+    # Ide másold az alap linkedet (viewform-ig)
+    base_url = "https://docs.google.com/spreadsheets/d/1sk5LgO3WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ/viewform"
+    
+    # Ide írd be az entry kódokat, amiket a pre-filled linkből látsz
+    params = {
+        "entry.12345678": datum.strftime("%Y-%m-%d"),
+        "entry.87654321": tipus,
+        "entry.11223344": szemely,
+        "entry.55667788": kategoria,
+        "entry.99001122": int(final_osszeg),
+        "entry.33445566": megjegyzes
+    }
+    
+    # Ez generálja le a kész, kitöltött linket
+    full_url = f"{base_url}?{urllib.parse.urlencode(params)}"
+    
+    st.success(f"✅ Készen áll a mentésre: {final_osszeg:,.0f} Ft")
+    
+    st.markdown(f"""
+        <a href="{full_url}" target="_blank">
+            <button style="width:100%; height:60px; background-color:#2e7d32; color:white; border:none; border-radius:10px; font-size:18px; font-weight:bold; cursor:pointer;">
+                🚀 KÜLDÉS A KÖZÖS TÁBLÁZATBA
+            </button>
+        </a>
+    """, unsafe_allow_html=True)
+    st.caption("A gomb megnyitja az űrlapot, ahol az adatok már be lesznek írva, csak a 'Küldés' gombot kell megnyomnod.")
