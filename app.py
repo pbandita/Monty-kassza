@@ -32,7 +32,7 @@ if mentes and nyers_osszeg > 0:
     
     # --- GOOGLE FORM ELÉRÉSI KÓD ÉS AUTOMATIZÁLÁS ---
     # Ide másold az alap linkedet (viewform-ig)
-    base_url = "https://docs.google.com/spreadsheets/d/1sk5LgO3WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ/viewform"
+    base_url = "https://docs.google.com/spreadsheets/d/AKfycbzVwCzkVtBBksB81JOA_CAgfWEgO1xIEsVxTd4rZAPmSgTTJuORLCdLM8xyiR4lDKYQ2A/viewform"
     
     # Ide írd be az entry kódokat, amiket a pre-filled linkből látsz
     params = {
