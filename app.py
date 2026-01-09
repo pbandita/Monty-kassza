@@ -82,12 +82,12 @@ else:
 
     
         h1, h2, h3 {{ 
-            color: #C8E6C9 !important; /* Halványzöld a jobb olvashatóságért */
-            font-family: 'Georgia', serif; 
+            color: #C8E6C9 !important; /
+            font-family: 'Palatino', serif; 
         }}
 
         /* 5. TÁBLÁZAT ÉS TABS SZÍNEK */
-        .stTabs [data-baseweb="tab"] {{ color: #FFFFFF !important; }}
+        .stTabs [data-baseweb="tab"] {{ color: {border_color} !important; }}
         .stDataFrame {{ background-color: {input_bg} !important; }}
         </style>
     """, unsafe_allow_html=True)
