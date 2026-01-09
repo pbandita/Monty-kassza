@@ -37,66 +37,70 @@ if 'user' not in st.session_state:
 user = st.session_state.user
 
 if user == "👤 Andris":
-    # --- Retro Gaming / Matrix Színek ---
-    retro_zold = "#00FF41" # Neon zöld
-    retro_fekete = "#0D0208" # Mély terminál fekete
-    grid_szin = "rgba(0, 255, 65, 0.1)" # Halvány neon rácsháló
+    # --- Neon Blue Retro Gaming Színek ---
+    neon_kek = "#00F2FF"    # Világító ciánkék / Neon kék
+    retro_fekete = "#050505" # Majdnem teljes fekete
+    grid_szin = "rgba(0, 242, 255, 0.15)" # Neon kék rácsháló
 
     st.markdown(f"""
         <style>
-        /* 1. RÁCSHÁLÓS HÁTTÉR ÉS ALAPSTÍLUS */
+        /* 1. RÁCSHÁLÓS HÁTTÉR */
         .stApp {{ 
             background-color: {retro_fekete};
             background-image: 
                 linear-gradient({grid_szin} 1px, transparent 1px),
                 linear-gradient(90deg, {grid_szin} 1px, transparent 1px);
-            background-size: 30px 30px; /* A rács négyzeteinek mérete */
-            color: {retro_zold};
-            font-family: 'Courier New', Courier, monospace !important;
+            background-size: 40px 40px; 
+            color: {neon_kek};
+            font-family: 'Lucida Console', Monaco, monospace !important;
         }}
 
-        /* 2. TERMINÁL KERETEK ÉS MEZŐK */
+        /* 2. MEZŐK ÉS TÁBLÁZATOK - KÉK KERETTEL */
         input, .stNumberInput input, div[data-baseweb="select"] > div, [data-testid="stDataFrame"] {{
-            background-color: rgba(0, 0, 0, 0.8) !important;
-            color: {retro_zold} !important;
-            border: 1px solid {retro_zold} !important;
-            border-radius: 0px !important; /* Szögletes, retro forma */
-            font-family: 'Courier New', Courier, monospace !important;
+            background-color: rgba(0, 20, 30, 0.9) !important; /* Mélykék fekete belső */
+            color: {neon_kek} !important;
+            border: 1px solid {neon_kek} !important;
+            border-radius: 0px !important;
+            font-family: 'Lucida Console', Monaco, monospace !important;
+            box-shadow: inset 0 0 5px {neon_kek}; /* Belső izzás a mezőknek */
         }}
 
-        /* 3. NEON GOMBOK */
+        /* 3. NEON KÉK GOMBOK */
         .stButton>button {{ 
             background-color: transparent !important; 
-            color: {retro_zold} !important; 
-            border: 2px solid {retro_zold} !important;
-            border-radius: 0px !important;
+            color: {neon_kek} !important; 
+            border: 2px solid {neon_kek} !important;
+            border-radius: 4px !important;
             text-transform: uppercase;
             font-weight: bold;
-            box-shadow: 0 0 10px {retro_zold}; /* Neon ragyogás */
+            box-shadow: 0 0 15px {neon_kek}; /* Kék neon ragyogás */
+            transition: all 0.3s ease-in-out;
         }}
         
         .stButton>button:hover {{
-            background-color: {retro_zold} !important;
+            background-color: {neon_kek} !important;
             color: {retro_fekete} !important;
-            box-shadow: 0 0 20px {retro_zold};
+            box-shadow: 0 0 30px {neon_kek};
+            transform: translateY(-2px);
         }}
 
-        /* 4. DIGITÁLIS CÍMEK */
+        /* 4. FEJLÉCEK */
         h1, h2, h3 {{ 
-            color: {retro_zold} !important; 
+            color: {neon_kek} !important; 
             text-transform: uppercase;
-            letter-spacing: 3px;
-            border-left: 5px solid {retro_zold};
-            padding-left: 10px;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px {neon_kek};
         }}
 
         /* 5. TABS */
         .stTabs [data-baseweb="tab"] {{ 
-            color: {retro_zold} !important;
-            background-color: transparent !important;
+            color: {neon_kek} !important;
         }}
-        </style>
-    """, unsafe_allow_html=True)
+
+        /* Scrollbar (görgetősáv) testreszabása a kék stílushoz */
+        ::-webkit-scrollbar {{ width: 8px; }}
+        ::-webkit-scrollbar-track {{ background: {retro_fekete}; }}
+        ::-webkit-scrollbar-thumb {{ background: {neon_
 else:
     # --- Berni Pásztor: Fekete alap, Fehér gombok, Barna keretek ---
     berni_fekete = "#121212" # Mélyfekete háttér
