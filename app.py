@@ -23,12 +23,12 @@ if 'user' not in st.session_state:
     col_a, col_z = st.columns(2)
     
     with col_a:
-        if st.button("💻 ANDRIS (Geek mód)", use_container_width=True):
+        if st.button("💻 ANDRIS", use_container_width=True):
             st.session_state.user = "👤 Andris"
             st.rerun()
             
     with col_z:
-        if st.button("🏇 ZSÓKA (Lovas mód)", use_container_width=True):
+        if st.button("🏇 ZSÓKA", use_container_width=True):
             st.session_state.user = "👤 Zsóka"
             st.rerun()
     st.stop() # Megállítjuk a kódot, amíg nincs választás
@@ -158,6 +158,7 @@ else:
         }}
         </style>
         """, unsafe_allow_html=True)
+    
 # --- ADATOK BETÖLTÉSE ---
 @st.cache_data(ttl=600)
 def get_rate():
