@@ -52,8 +52,7 @@ else:
     berni_barna = "#FFFFFF"
     berni_feher = "#A0522D"
     
-    # Kényszerítjük a Plotly-t, hogy világos legyen Zsókánál
-    px.defaults.template = "plotly_white"
+
 
     st.markdown(f"""
         <style>
