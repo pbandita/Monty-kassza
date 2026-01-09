@@ -56,18 +56,24 @@ if 'animated' not in st.session_state:
             time.sleep(0.5)
             
     else:
+        # ZSÓKA ANIMÁCIÓ + VONULÓ TAPPANCSOK
         with placeholder.container():
             st.markdown("<h2 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h2>", unsafe_allow_html=True)
-            st.markdown("<div style='display: flex; justify-content: center;'><img src='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJic2t6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/5AtX86f3fDfyE/giphy.gif' width='200'></div>", unsafe_allow_html=True)
-            bar = st.progress(0)
-            for i in range(100):
-                time.sleep(0.01)
-                bar.progress(i + 1)
+            
+            # Ez a rész generálja a tappancsokat egymás után
+            tappancs_container = st.empty()
+            tappancsok = ""
+            for i in range(1, 11):
+                # Egyre több tappancsot fűzünk össze
+                tappancsok += "🐾 "
+                # HTML-ben jelenítjük meg, hogy szép nagy legyen és középen
+                tappancs_container.markdown(f"<div style='font-size: 50px; text-align: center; letter-spacing: 20px;'>{tappancsok}</div>", unsafe_allow_html=True)
+                time.sleep(0.3) # Itt állítsd a sebességet
+            
+            # A végén egy kis ugráló kutyus üdvözlésnek
+            st.markdown("<div style='display: flex; justify-content: center;'><img src='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJic2t6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/5AtX86f3fDfyE/giphy.gif' width='150'></div>", unsafe_allow_html=True)
             st.markdown("<h3 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h3>", unsafe_allow_html=True)
-            time.sleep(1)
-
-    st.session_state.animated = True
-    placeholder.empty()
+            time.sleep(1.2)
 
 # --- USER SPECIFIKUS DESIGN ---
 user = st.session_state.user
