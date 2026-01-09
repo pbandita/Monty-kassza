@@ -2,39 +2,35 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 import io
-import random # A lovas üzenetekhez
+import random
 
-# --- 0. ALAPBEÁLLÍTÁSOK ---
+# --- ALAPOK ---
 st.set_page_config(page_title="Andris & Zsóka Kassza", layout="wide", page_icon="💰")
 px.defaults.template = "plotly_dark"
 
 SHEET_ID = "1sk5LgO3WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ"
+# FONTOS: Ezeket a GID-eket a böngésző URL-jéből másold ki!
 CSV_URL_MAIN = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=0"
 CSV_URL_FIXEK = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=1493472585" 
-
 SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyHCbk2E4E01AQflCl4K9qYH-GXPSuzHHU0yMS7XhATHkBnb7Gy87EFcdGDrAmrnU68w/exec"
 
-# --- EUR-HUF ÁRFOLYAM LEKÉRDEZÉSE (Gyorsítótárazva) ---
-@st.cache_data(ttl=600) # 10 percig tárolja az árfolyamot
+@st.cache_data(ttl=600)
 def get_eur_huf():
     try:
         r = requests.get("https://open.er-api.com/v6/latest/EUR")
         return r.json()['rates']['HUF']
-    except: 
-        return 410.0 # Vészhelyzeti árfolyam
+    except: return 410.0
 
 arfolyam = get_eur_huf()
 
-# --- ADATOK BETÖLTÉSE ---
 def load_sheet(url):
     try:
         r_url = f"{url}&cb={datetime.now().timestamp()}"
         response = requests.get(r_url, timeout=10)
         if response.status_code == 200:
-            raw_data = response.content.decode('utf-8')
-            df = pd.read_csv(io.StringIO(raw_data))
+            df = pd.read_csv(io.StringIO(response.content.decode('utf-8')))
             df.columns = [c.strip().lower() for c in df.columns]
             return df
         return pd.DataFrame()
@@ -44,118 +40,78 @@ df_main = load_sheet(CSV_URL_MAIN)
 df_fixek = load_sheet(CSV_URL_FIXEK)
 
 # --- FELÜLET ---
-tab1, tab2, tab3 = st.tabs(["📝 Könyvelés", "📊 Kimutatások", "📅 Naptár & Fixek"])
+st.title("💰 Andris & Zsóka Közös Kassza")
+
+tab1, tab2, tab3 = st.tabs(["📝 Könyvelés", "📊 Kimutatások", "📅 Adatok"])
 
 with tab1:
-    col_bal, col_jobb = st.columns(2) # Most csak két oszlop marad itt, mert a fizetést beraktuk a Típusba
-
-    # BAL OLDAL: Normál tranzakció + EUR átváltás
+    # Felül egy vékony infó sáv
+    st.info(f"Aktuális árfolyam: **1 EUR = {arfolyam:.2f} HUF**")
+    
+    col_bal, col_jobb = st.columns([1, 1], gap="large")
+    
     with col_bal:
-        st.subheader("🖋️ Egyszeri tétel")
-        with st.form("beviteli_iv", clear_on_submit=True):
-            datum = st.date_input("Dátum", datetime.now())
-            # Fizetés hozzáadva a típusokhoz
-            tipus = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel", "💰 Megtakarítás", "💵 Fizetés"])
-            szemely = st.selectbox("Ki rögzítette?", ["👤 Andris", "👤 Zsóka", "👥 Közös"])
-            kategoria = st.selectbox("Kategória", ["🏠 Lakás/Rezsi", "🛒 Élelmiszer", "🏦 Hitel", "🚗 Közlekedés", "🐶 Monty", "💰 Megtakarítás", "📦 Egyéb"])
-            
-            # Valuta választó és összeg mező
-            v_col1, v_col2 = st.columns([1,2])
-            valuta = v_col1.selectbox("Pénznem", ["HUF", "EUR"])
-            nyers_osszeg = v_col2.number_input("Összeg", min_value=0.0)
-            
-            megjegyzes = st.text_input("Megjegyzés")
-            
-            # Andris Mimic gombja
-            if st.form_submit_button("👅 MIMIC LÁDA ELNYELI (MENTÉS)"):
-                if nyers_osszeg > 0:
-                    final_osszeg = int(nyers_osszeg if valuta == "HUF" else nyers_osszeg * arfolyam)
-                    
-                    res = requests.post(SCRIPT_URL, json={
-                        "is_fix": False,
-                        "is_salary": (tipus == "💵 Fizetés"), # Jelöljük, ha fizetés
-                        "datum": str(datum), 
-                        "tipus": tipus, 
-                        "szemely": szemely,
-                        "kategoria": kategoria, 
-                        "osszeg": final_osszeg, 
-                        "megjegyzes": megjegyzes
-                    })
-                    st.success(f"A Mimic elnyelte az érméket! ({final_osszeg:,.0f} Ft elmentve) 👅💰")
-                    st.rerun()
+        st.markdown("### 🖋️ Tranzakció rögzítése")
+        with st.container(border=True):
+            with st.form("napi_form", clear_on_submit=True):
+                d = st.date_input("Dátum", datetime.now())
+                t = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel", "💰 Megtakarítás", "💵 Fizetés"])
+                sz = st.selectbox("Személy", ["👤 Andris", "👤 Zsóka", "👥 Közös"])
+                k = st.selectbox("Kategória", ["🏠 Lakás/Rezsi", "🛒 Élelmiszer", "🏦 Hitel", "🚗 Közlekedés", "🐶 Monty", "💰 Megtakarítás", "📦 Egyéb"])
+                
+                v_c1, v_c2 = st.columns([1, 2])
+                valuta = v_c1.selectbox("Pénznem", ["HUF", "EUR"], key="v1")
+                osszeg = v_c2.number_input("Összeg", min_value=0.0)
+                megj = st.text_input("Megjegyzés")
+                
+                if st.form_submit_button("👅 MIMIC LÁDA ELNYELI"):
+                    if osszeg > 0:
+                        final = int(osszeg if valuta == "HUF" else osszeg * arfolyam)
+                        requests.post(SCRIPT_URL, json={
+                            "is_fix": False, "datum": str(d), "tipus": t, 
+                            "szemely": sz, "kategoria": k, "osszeg": final, "megjegyzes": megj
+                        })
+                        st.balloons()
+                        st.rerun()
 
-    # JOBB OLDAL: Fix kiadás rögzítése a Sheet2-re
     with col_jobb:
-        st.subheader("🔁 Havi fix ütemezése")
-        with st.form("fix_form", clear_on_submit=True):
-            f_nev = st.text_input("Megnevezés (pl. Netflix)")
-            f_kat = st.selectbox("Kategória ", ["🏠 Lakás/Rezsi", "🏦 Hitel", "💰 Megtakarítás", "📦 Egyéb"])
-            f_osszeg = st.number_input("Havi fix összeg (HUF)", min_value=0, key="fix_osszeg")
-            f_datum = st.date_input("Kezdő dátum", datetime.now()) # Ez lesz az utolso_datum a Sheet2-ben
-            
-            if st.form_submit_button("ÜTEMEZÉS MENTÉSE A FELHŐBE"):
-                if f_osszeg > 0 and f_nev:
-                    res = requests.post(SCRIPT_URL, json={
-                        "is_fix": True,
-                        "is_salary": False, # Fixeknél nem fizetés
-                        "nev": f_nev,
-                        "kategoria": f_kat,
-                        "osszeg": int(f_osszeg),
-                        "datum": str(f_datum) # Itt a 'datum' az utolso_datumot jelöli
-                    })
-                    st.success("Havi fix rögzítve a Google Táblázatban!")
-                    st.rerun()
+        st.markdown("### 🔁 Fix kiadás ütemezése")
+        with st.container(border=True):
+            with st.form("fix_form", clear_on_submit=True):
+                f_nev = st.text_input("Megnevezés")
+                f_kat = st.selectbox("Kategória", ["🏠 Lakás/Rezsi", "🏦 Hitel", "💰 Megtakarítás", "📦 Egyéb"], key="f1")
+                f_osszeg = st.number_input("Havi HUF", min_value=0)
+                f_d = st.date_input("Nap", datetime.now())
+                
+                if st.form_submit_button("📜 PERGAMENRE ÍRÁS (FIX MENTÉS)"):
+                    if f_osszeg > 0:
+                        requests.post(SCRIPT_URL, json={
+                            "is_fix": True, "nev": f_nev, "kategoria": f_kat, "osszeg": int(f_osszeg), "datum": str(f_d)
+                        })
+                        st.success("A kincstárnok feljegyezte!")
+                        st.rerun()
 
 with tab2:
-    st.subheader("📊 Kimutatások")
-    if st.button("🔄 Adatok frissítése"):
-        st.rerun()
-
     if not df_main.empty:
+        # Itt is érvényesítjük a szűrést
         df_main['tipus_clean'] = df_main['tipus'].astype(str).str.lower()
-        
-        # Kiadások szűrése (a fizetés nincs benne)
         kiadas_df = df_main[df_main['tipus_clean'].str.contains("kiad|megtak", na=False)].copy()
         
-        if not kiadas_df.empty:
-            c1, c2 = st.columns(2)
-            with c1:
-                st.plotly_chart(px.pie(kiadas_df, values='osszeg', names='kategoria', title="Kiadások megoszlása"), use_container_width=True)
-            with c2:
-                kiadas_df['honap'] = pd.to_datetime(kiadas_df['datum']).dt.strftime('%Y-%m')
-                trend = kiadas_df.groupby('honap')['osszeg'].sum().reset_index()
-                st.plotly_chart(px.line(trend, x='honap', y='osszeg', title="Havi költés alakulása", markers=True), use_container_width=True)
-        else:
-            st.warning("Nincs megjeleníthető kiadás.")
-    else:
-        st.error("A tranzakciós táblázat üres vagy nem elérhető.")
+        c1, c2 = st.columns(2)
+        with c1:
+            st.plotly_chart(px.pie(kiadas_df, values='osszeg', names='kategoria', title="Mire megy el a pénz?"), use_container_width=True)
+        with c2:
+            kiadas_df['honap'] = pd.to_datetime(kiadas_df['datum']).dt.strftime('%Y-%m')
+            trend = kiadas_df.groupby('honap')['osszeg'].sum().reset_index()
+            st.plotly_chart(px.line(trend, x='honap', y='osszeg', title="Havi költés", markers=True), use_container_width=True)
 
 with tab3:
-    st.subheader("📅 Adatok áttekintése")
-    st.write("**Fixek a felhőben (Google Sheet 2):**")
-    if not df_fixek.empty:
-        st.dataframe(df_fixek, use_container_width=True)
-    else:
-        st.info("Nincs rögzített fix tétel a 'Fixek' fülön.")
-    
-    st.divider()
-    st.write("**Utolsó tranzakciók (Google Sheet 1):**")
-    st.dataframe(df_main.sort_values('datum', ascending=False).head(20), use_container_width=True)
+    st.subheader("Tranzakciók")
+    st.dataframe(df_main.sort_values('datum', ascending=False), use_container_width=True)
+    st.subheader("Aktív Fixek")
+    st.dataframe(df_fixek, use_container_width=True)
 
-# --- Zsóka Lovasa (Easter Egg) ---
+# --- Zsóka Lovasa ---
+knight_msg = ["Jó munkát, Zsóka!", "Az aranyad biztonságban van!", "Vigyázok a kincstárra!", "Monty is büszke rád!"]
 st.divider()
-knight_messages = [
-    "Jó estét, Zsóka! Az arany biztonságban van!",
-    "Figyelmed éles, mint a penge, Zsóka! Minden garas a helyén?",
-    "Hű lovagod jelentkezik, Zsóka! Milyen kalandok várnak ma?",
-    "A kincstár csillog, mint a hajnali harmat, Zsóka!",
-    "Bátorságod példaértékű, Zsóka! Hajrá a spóroláshoz!",
-    "Monty már várja a sétát, Zsóka!",
-    "Egy gondos gazdasszony vagy, Zsóka! Ez a kincstár a tiéd!"
-]
-
-col_knight1, col_knight2 = st.columns([1, 10])
-with col_knight1:
-    st.markdown("🏇") # Lovas emoji
-with col_knight2:
-    st.caption(f"**A Kincstár Őre:** _{random.choice(knight_messages)}_")
+st.markdown(f"🏇 **A Lovag üzeni:** _{random.choice(knight_msg)}_")
