@@ -58,7 +58,7 @@ if 'animated' not in st.session_state:
     else:
         # ZSÓKA GIF ANIMÁCIÓ
         with placeholder.container():
-            st.markdown("<h1 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h1>", unsafe_allow_html=True)
+            st.markdown("<h1 style='text-align:center;'>Csokolom kívánok!</h1>", unsafe_allow_html=True)
             
             # Ide illeszthetsz bármilyen állatos/tappancsos GIF linket
             gif_url = "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMzIyZTc1eTd2dDgxM2VuOHJrdHJjemRuemV4dm43bDA1dGp1ZXFwYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/U7xQEBePTRS6OVhY0H/giphy.gif"
@@ -66,7 +66,7 @@ if 'animated' not in st.session_state:
             st.image(gif_url, use_container_width=300)
             
             time.sleep(3) # Ennyi ideig látszik a GIF
-            st.markdown("<h2 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h2>", unsafe_allow_html=True)
+            st.markdown("<h2 style='text-align:center;'>MaMiiiii</h2>", unsafe_allow_html=True)
             time.sleep(1.5)
             
     st.session_state.animated = True
@@ -132,7 +132,7 @@ else:
     """, unsafe_allow_html=True)
 
 # --- FELÜLET ---
-st.title(f"{'⚡ TERMINÁL: ' if user == '👤 Andris' else '🏇 KASTÉLY: '} Üdvözlünk, {user}!")
+st.title(f"{'' if user == '👤 Andris' else ''} Ez a te felületed!, {user}!")
 
 if st.sidebar.button("🚪 Kijelentkezés"):
     for key in list(st.session_state.keys()):
