@@ -94,7 +94,8 @@ if 'animated' not in st.session_state:
                 elemek_html.append(uj_elem)
                 
                 # Kirajzoljuk az összes eddigi elemet
-                kaosz_area.markdown(f"<div>{''.join(elemek_html)}</div>", unsafe_allow_html=True)
+                # A ciklus végén így legyen:
+kaosz_area.markdown(f"<div>{''.join(elemek_html)}</div>", unsafe_allow_html=True)
                 
                 # Még gyorsabb tempó a végére
                 wait_time = max(0.005, 0.15 - (i * 0.004))
