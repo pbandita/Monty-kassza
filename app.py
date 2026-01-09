@@ -37,13 +37,64 @@ if 'user' not in st.session_state:
 user = st.session_state.user
 
 if user == "👤 Andris":
-    primary_color = "#FF00FF" # Matrix Zöld
-    bg_color = "#0000FF"
+    # --- Retro Gaming / Matrix Színek ---
+    retro_zold = "#00FF41" # Neon zöld
+    retro_fekete = "#0D0208" # Mély terminál fekete
+    grid_szin = "rgba(0, 255, 65, 0.1)" # Halvány neon rácsháló
+
     st.markdown(f"""
         <style>
-        .stApp {{ background-color: {bg_color}; color: {primary_color}; font-family: 'Courier New', monospace; }}
-        .stButton>button {{ border: 2px solid {primary_color} !important; color: {primary_color} !important; background-color: black !important; }}
-        h1, h2, h3 {{ color: {primary_color} !important; text-shadow: 2px 2px 5px #000; font-family: 'Monaco', monospace !important }}
+        /* 1. RÁCSHÁLÓS HÁTTÉR ÉS ALAPSTÍLUS */
+        .stApp {{ 
+            background-color: {retro_fekete};
+            background-image: 
+                linear-gradient({grid_szin} 1px, transparent 1px),
+                linear-gradient(90deg, {grid_szin} 1px, transparent 1px);
+            background-size: 30px 30px; /* A rács négyzeteinek mérete */
+            color: {retro_zold};
+            font-family: 'Courier New', Courier, monospace !important;
+        }}
+
+        /* 2. TERMINÁL KERETEK ÉS MEZŐK */
+        input, .stNumberInput input, div[data-baseweb="select"] > div, [data-testid="stDataFrame"] {{
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            color: {retro_zold} !important;
+            border: 1px solid {retro_zold} !important;
+            border-radius: 0px !important; /* Szögletes, retro forma */
+            font-family: 'Courier New', Courier, monospace !important;
+        }}
+
+        /* 3. NEON GOMBOK */
+        .stButton>button {{ 
+            background-color: transparent !important; 
+            color: {retro_zold} !important; 
+            border: 2px solid {retro_zold} !important;
+            border-radius: 0px !important;
+            text-transform: uppercase;
+            font-weight: bold;
+            box-shadow: 0 0 10px {retro_zold}; /* Neon ragyogás */
+        }}
+        
+        .stButton>button:hover {{
+            background-color: {retro_zold} !important;
+            color: {retro_fekete} !important;
+            box-shadow: 0 0 20px {retro_zold};
+        }}
+
+        /* 4. DIGITÁLIS CÍMEK */
+        h1, h2, h3 {{ 
+            color: {retro_zold} !important; 
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-left: 5px solid {retro_zold};
+            padding-left: 10px;
+        }}
+
+        /* 5. TABS */
+        .stTabs [data-baseweb="tab"] {{ 
+            color: {retro_zold} !important;
+            background-color: transparent !important;
+        }}
         </style>
     """, unsafe_allow_html=True)
 else:
