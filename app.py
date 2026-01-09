@@ -243,7 +243,20 @@ with tab2:
 with tab3:
     st.write("**Tranzakcióid naplója:**")
     st.dataframe(df_main.sort_values('datum', ascending=False).head(30), use_container_width=True)
+    st.subheader("Sor törlése")
+row_to_delete = st.number_input("Melyik sorszámú sort töröljem?", min_value=0, 
+                                max_value=len(df_main)-1 if not df_main.empty else 0, step=1)
 
+if st.button("❌ Kijelölt sor törlése"):
+    if not df_main.empty:
+        # Töröljük a választott indexű sort
+        df_main = df_main.drop(df_main.index[row_to_delete])
+        # Elmentjük a frissített listát a CSV-be
+        df_main.to_csv("expenses.csv", index=False)
+        st.success(f"A(z) {row_to_delete}. sorszámú sor törölve!")
+        st.rerun() # Frissítjük az oldalt, hogy eltűnjön a sor
+    else:
+        st.error("Nincs mit törölni, a lista üres!")
 # --- LÁTVÁNY ELEMEK ---
 if user == "👤 Zsóka":
     msgs = ["Micsoda elegancia!", "A parpák már várnak!", "Ragyogó könyvelés, Zsóka!", "Minden aranyad biztonságban!"]
