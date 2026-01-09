@@ -54,31 +54,24 @@ if 'animated' not in st.session_state:
                     time.sleep(0.01)
                 full_text += current_line + "<br>"
             time.sleep(0.5)
+            
     else:
+        # ZSÓKA ANIMÁCIÓ + VONULÓ TAPPANCSOK
         with placeholder.container():
             st.markdown("<h2 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h2>", unsafe_allow_html=True)
-            
-            # Ez egy szebb, grafikus tappancs kódja (SVG)
-            def get_paws_html(count):
-                paw_svg = """
-                <svg width="60" height="60" viewBox="0 0 100 100" style="margin: 10px;">
-                    <path fill="#A0522D" d="M30 45c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9zm20-5c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9zm20 5c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9zM50 85c10 0 18-8 18-18 0-8-5-15-12-17-2-1-4-1-6-1s-4 0-6 1c-7 2-12 9-12 17 0 10 8 18 18 18z"/>
-                </svg>
-                """
-                return f"<div style='display: flex; justify-content: center;'>{paw_svg * count}</div>"
+            tappancs_container = st.empty()
+            tappancsok = ""
+            for i in range(1, 11):
+                tappancsok += "🐾 "
+                tappancs_container.markdown(f"<div style='font-size: 50px; text-align: center; letter-spacing: 20px;'>{tappancsok}</div>", unsafe_allow_html=True)
+                time.sleep(0.3)
+            # Biztonságos GIF link (Monty ugrál)
+            st.markdown("<div style='display: flex; justify-content: center;'><img src='https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2ZicGZicGZicGZicGZicGZicGZicGZicGZicGZicGZicGZicGZpJmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/5AtX86f3fDfyE/giphy.gif' width='150'></div>", unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h3>", unsafe_allow_html=True)
+            time.sleep(0.8)
 
-            t_placeholder = st.empty()
-            for i in range(1, 7):
-                t_placeholder.markdown(get_paws_html(i), unsafe_allow_html=True)
-                time.sleep(0.4)
-            
-            st.markdown("<h3 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h3>", unsafe_allow_html=True)
-            time.sleep(1)
-            
-            # A végén egy kis ugráló kutyus üdvözlésnek
-            st.markdown("<div style='display: flex; justify-content: center;'><img src='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJic2t6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/5AtX86f3fDfyE/giphy.gif' width='150'></div>", unsafe_allow_html=True)
-            st.markdown("<h3 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h3>", unsafe_allow_html=True)
-            time.sleep(0.5)
+    st.session_state.animated = True
+    placeholder.empty() # Fontos: Ez tünteti el az animációt a belépés után!
 
 # --- USER SPECIFIKUS DESIGN ---
 user = st.session_state.user
@@ -92,11 +85,11 @@ if user == "👤 Andris":
             background-size: 40px 40px; color: #00F2FF; font-family: 'Lucida Console', Monaco, monospace !important;
         }}
         .stApp::before {{
-            content: ""; position: fixed; top: 0; left: -100%; width: 100%; height: 3px;
+            content: ""; position: fixed; top: -100%; left: -100%; width: 300%; height: 5px;
             background: linear-gradient(90deg, transparent, #00F2FF, #FFFFFF, #00F2FF, transparent);
-            animation: sweep 3s infinite; z-index: 1000;
+            transform: rotate(45deg); animation: sweep 5s infinite linear; z-index: 1000; opacity: 0.5;
         }}
-        @keyframes sweep {{ 0% {{ left: -100%; }} 50% {{ left: 100%; }} 100% {{ left: 100%; }} }}
+        @keyframes sweep {{ 0% {{ top: -100%; left: -100%; }} 100% {{ top: 100%; left: 100%; }} }}
         input, .stNumberInput input, div[data-baseweb="select"] > div, [data-testid="stDataFrame"] {{
             background-color: rgba(0, 20, 30, 0.9) !important; color: white !important;
             border: 1px solid #00F2FF !important; box-shadow: inset 0 0 5px #00F2FF;
@@ -140,9 +133,11 @@ df_fixek = load_data(CSV_URL_FIXEK)
 
 # --- FELÜLET ---
 st.title(f"{'⚡ TERMINÁL: ' if user == '👤 Andris' else '🏇 KASTÉLY: '} Üdvözlünk, {user}!")
-if st.button("🚪 Kijelentkezés"):
-    del st.session_state.user
-    if 'animated' in st.session_state: del st.session_state.animated
+
+# Kijelentkezés a Sidebarba (így nem zavar be középen)
+if st.sidebar.button("🚪 Kijelentkezés"):
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
     st.rerun()
 
 tab1, tab2, tab3 = st.tabs(["📝 Könyvelés", "📊 Statisztika", "📅 Adatbázis"])
