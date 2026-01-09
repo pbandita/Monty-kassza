@@ -49,7 +49,7 @@ if user == "👤 Andris":
 else:
     # --- Berni Pásztor Színpaletta ---
     berni_fekete = "#212121"
-    berni_barna = "#FFFFF"
+    berni_barna = "#FFFFFF"
     berni_feher = "#A0522D"
     
     # Kényszerítjük a Plotly-t, hogy világos legyen Zsókánál
