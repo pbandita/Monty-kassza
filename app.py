@@ -55,20 +55,27 @@ if 'animated' not in st.session_state:
                 full_text += current_line + "<br>"
             time.sleep(0.5)
             
-    else:
-        # ZSÓKA ANIMÁCIÓ + VONULÓ TAPPANCSOK
+   else:
+        # ZSÓKA ANIMÁCIÓ + VONULÓ SVG TAPPANCSOK
         with placeholder.container():
             st.markdown("<h2 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h2>", unsafe_allow_html=True)
             
-            # Ez a rész generálja a tappancsokat egymás után
-            tappancs_container = st.empty()
-            tappancsok = ""
-            for i in range(1, 11):
-                # Egyre több tappancsot fűzünk össze
-                tappancsok += "🐾 "
-                # HTML-ben jelenítjük meg, hogy szép nagy legyen és középen
-                tappancs_container.markdown(f"<div style='font-size: 50px; text-align: center; letter-spacing: 20px;'>{tappancsok}</div>", unsafe_allow_html=True)
-                time.sleep(0.3) # Itt állítsd a sebességet
+            # Ez egy szebb, grafikus tappancs kódja (SVG)
+            def get_paws_html(count):
+                paw_svg = """
+                <svg width="60" height="60" viewBox="0 0 100 100" style="margin: 10px;">
+                    <path fill="#A0522D" d="M30 45c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9zm20-5c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9zm20 5c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9zM50 85c10 0 18-8 18-18 0-8-5-15-12-17-2-1-4-1-6-1s-4 0-6 1c-7 2-12 9-12 17 0 10 8 18 18 18z"/>
+                </svg>
+                """
+                return f"<div style='display: flex; justify-content: center;'>{paw_svg * count}</div>"
+
+            t_placeholder = st.empty()
+            for i in range(1, 7):
+                t_placeholder.markdown(get_paws_html(i), unsafe_allow_html=True)
+                time.sleep(0.4)
+            
+            st.markdown("<h3 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h3>", unsafe_allow_html=True)
+            time.sleep(1)
             
             # A végén egy kis ugráló kutyus üdvözlésnek
             st.markdown("<div style='display: flex; justify-content: center;'><img src='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJic2t6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/5AtX86f3fDfyE/giphy.gif' width='150'></div>", unsafe_allow_html=True)
