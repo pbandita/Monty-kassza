@@ -37,8 +37,8 @@ if 'user' not in st.session_state:
 user = st.session_state.user
 
 if user == "👤 Andris":
-    primary_color = "#00FF41" # Matrix Zöld
-    bg_color = "#0D0208"
+    primary_color = "#FF00FF" # Matrix Zöld
+    bg_color = "#0000FF"
     st.markdown(f"""
         <style>
         .stApp {{ background-color: {bg_color}; color: {primary_color}; font-family: 'Courier New', monospace; }}
@@ -47,8 +47,8 @@ if user == "👤 Andris":
         </style>
     """, unsafe_allow_html=True)
 else:
-    primary_color = "#D4AF37" # Arany
-    bg_color = "#FFF5F7" # Halvány rózsaszín
+    primary_color = "8B4513" # Arany
+    bg_color = "#98FF98" # Halvány rózsaszín
     st.markdown(f"""
         <style>
         .stApp {{ background-color: {bg_color}; color: #5D4037; }}
