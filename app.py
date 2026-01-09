@@ -54,9 +54,7 @@ if 'animated' not in st.session_state:
                     time.sleep(0.01)
                 full_text += current_line + "<br>"
             time.sleep(0.5)
-            
-   else:
-        # ZSÓKA ANIMÁCIÓ + VONULÓ SVG TAPPANCSOK
+    else:
         with placeholder.container():
             st.markdown("<h2 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h2>", unsafe_allow_html=True)
             
