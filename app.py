@@ -63,7 +63,7 @@ if 'animated' not in st.session_state:
             # Ide illeszthetsz bármilyen állatos/tappancsos GIF linket
             gif_url = "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMzIyZTc1eTd2dDgxM2VuOHJrdHJjemRuemV4dm43bDA1dGp1ZXFwYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/U7xQEBePTRS6OVhY0H/giphy.gif"
             
-            st.image(gif_url, use_container_width=True)
+            st.image(gif_url, use_container_width=300)
             
             time.sleep(3) # Ennyi ideig látszik a GIF
             st.markdown("<h2 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h2>", unsafe_allow_html=True)
