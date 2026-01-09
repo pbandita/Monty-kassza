@@ -5,6 +5,7 @@ import requests
 from datetime import datetime
 import io
 import random
+import time
 
 # --- 0. ALAPBEÁLLÍTÁSOK ---
 st.set_page_config(page_title="Andris & Zsóka Kassza", layout="wide", page_icon="💰")
@@ -14,9 +15,6 @@ SHEET_ID = "1sk5LgO3WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ"
 CSV_URL_MAIN = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=0"
 CSV_URL_FIXEK = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=1493472585"
 SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcVcDv5Y6uTvogFaUqsjI14N51ovegiqXBak6u9Dl7kzGrVf8JuEPZvJmFOE0X7kqffQ/exec"
-
-# --- BELÉPÉSI LOGIKA ---
-import time # Ezt add hozzá az importokhoz a kód elején!
 
 # --- BELÉPÉSI LOGIKA ---
 if 'user' not in st.session_state:
@@ -39,7 +37,6 @@ if 'animated' not in st.session_state:
     placeholder = st.empty()
     
     if st.session_state.user == "👤 Andris":
-        # TERMINÁL ANIMÁCIÓ
         with placeholder.container():
             lines = [
                 "> BOOTING SYSTEM...",
@@ -50,90 +47,64 @@ if 'animated' not in st.session_state:
             ]
             full_text = ""
             for line in lines:
+                current_line = ""
                 for char in line:
-                    full_text += char
-                    st.markdown(f"<code style='color:#00F2FF; font-size:20px;'>{full_text}█</code>", unsafe_allow_html=True)
-                    time.sleep(0.01) # Gépelés sebessége
-                full_text += "<br>"
+                    current_line += char
+                    placeholder.markdown(f"<code style='color:#00F2FF; font-size:20px;'>{full_text}{current_line}█</code>", unsafe_allow_html=True)
+                    time.sleep(0.01)
+                full_text += current_line + "<br>"
             time.sleep(0.5)
             
     else:
-        # ZSÓKA ANIMÁCIÓ + UGRÁLÓ KUTYUS
         with placeholder.container():
             st.markdown("<h2 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h2>", unsafe_allow_html=True)
-            # Itt egy ugráló Berni kutyus GIF (Lottie helyett egyszerűbb egy jó minőségű GIF)
-            st.markdown("![Berni](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJic2t6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/5AtX86f3fDfyE/giphy.gif)", unsafe_allow_html=True)
+            st.markdown("<div style='display: flex; justify-content: center;'><img src='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJic2t6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/5AtX86f3fDfyE/giphy.gif' width='200'></div>", unsafe_allow_html=True)
             bar = st.progress(0)
             for i in range(100):
-                time.sleep(0.02)
+                time.sleep(0.01)
                 bar.progress(i + 1)
             st.markdown("<h3 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h3>", unsafe_allow_html=True)
             time.sleep(1)
 
     st.session_state.animated = True
-    placeholder.empty() # Töröljük az animációt, hogy jöhessen a valódi felület
-            
-    else:
-        # ZSÓKA ANIMÁCIÓ + UGRÁLÓ KUTYUS
-        with placeholder.container():
-            st.markdown("<h2 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h2>", unsafe_allow_html=True)
-            # Itt egy ugráló Berni kutyus GIF (Lottie helyett egyszerűbb egy jó minőségű GIF)
-            st.markdown("![Berni](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJic2t6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/5AtX86f3fDfyE/giphy.gif)", unsafe_allow_html=True)
-            bar = st.progress(0)
-            for i in range(100):
-                time.sleep(0.02)
-                bar.progress(i + 1)
-            st.markdown("<h3 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h3>", unsafe_allow_html=True)
-            time.sleep(1)
-
-    st.session_state.animated = True
-    placeholder.empty() # Töröljük az animációt, hogy jöhessen a valódi felület
+    placeholder.empty()
 
 # --- USER SPECIFIKUS DESIGN ---
 user = st.session_state.user
 
 if user == "👤 Andris":
-    retro_feher = "#FFFFFF"
-    neon_kek = "#00F2FF"
-    retro_fekete = "#050505"
-    grid_szin = "rgba(0, 242, 255, 0.15)"
-
     st.markdown(f"""
         <style>
         .stApp {{ 
-            background-color: {retro_fekete};
-            background-image: linear-gradient({grid_szin} 1px, transparent 1px), linear-gradient(90deg, {grid_szin} 1px, transparent 1px);
-            background-size: 40px 40px; color: {neon_kek}; font-family: 'Lucida Console', Monaco, monospace !important;
+            background-color: #050505;
+            background-image: linear-gradient(rgba(0, 242, 255, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 255, 0.15) 1px, transparent 1px);
+            background-size: 40px 40px; color: #00F2FF; font-family: 'Lucida Console', Monaco, monospace !important;
         }}
+        .stApp::before {{
+            content: ""; position: fixed; top: 0; left: -100%; width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent, #00F2FF, #FFFFFF, #00F2FF, transparent);
+            animation: sweep 3s infinite; z-index: 1000;
+        }}
+        @keyframes sweep {{ 0% {{ left: -100%; }} 50% {{ left: 100%; }} 100% {{ left: 100%; }} }}
         input, .stNumberInput input, div[data-baseweb="select"] > div, [data-testid="stDataFrame"] {{
-            background-color: rgba(0, 20, 30, 0.9) !important; color: {retro_feher} !important;
-            border: 1px solid {neon_kek} !important; border-radius: 0px !important;
-            box-shadow: inset 0 0 5px {neon_kek};
+            background-color: rgba(0, 20, 30, 0.9) !important; color: white !important;
+            border: 1px solid #00F2FF !important; box-shadow: inset 0 0 5px #00F2FF;
         }}
         .stButton>button {{ 
-            background-color: transparent !important; color: {neon_kek} !important; 
-            border: 2px solid {neon_kek} !important; border-radius: 4px !important;
-            text-transform: uppercase; font-weight: bold; box-shadow: 0 0 15px {neon_kek};
+            background-color: transparent !important; color: #00F2FF !important; 
+            border: 2px solid #00F2FF !important; box-shadow: 0 0 15px #00F2FF;
         }}
-        .stButton>button:hover {{ background-color: {neon_kek} !important; color: {retro_fekete} !important; box-shadow: 0 0 30px {neon_kek}; }}
-        h1, h2, h3 {{ color: {retro_feher} !important; text-transform: uppercase; letter-spacing: 5px; text-shadow: 0 0 10px {neon_kek}; }}
-        .stTabs [data-baseweb="tab"] {{ color: {retro_feher} !important; }}
+        h1, h2, h3 {{ color: white !important; text-shadow: 0 0 10px #00F2FF; }}
         </style>
     """, unsafe_allow_html=True)
 else:
-    berni_fekete = "#121212" 
-    berni_barna  = "#A0522D" 
-    berni_feher  = "#FFFFFF" 
+    berni_barna = "#A0522D"
     tappancs_svg = f"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 100 100'%3E%3Cpath fill='%23{berni_barna[1:]}' fill-opacity='0.2' d='M30 45c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9zm20-5c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9zm20 5c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9zM50 85c10 0 18-8 18-18 0-8-5-15-12-17-2-1-4-1-6-1s-4 0-6 1c-7 2-12 9-12 17 0 10 8 18 18 18z'/%3E%3C/svg%3E"
-
     st.markdown(f"""
         <style>
-        .stApp {{ background-color: {berni_fekete} !important; background-image: url("{tappancs_svg}"); background-repeat: repeat; background-size: 70px 70px; color: {berni_feher}; border: 10px solid {berni_barna}; box-sizing: border-box; }}
-        input, .stNumberInput input, div[data-baseweb="select"] > div, [data-testid="stDataFrame"] {{ background-color: rgba(30, 30, 30, 0.9) !important; color: {berni_feher} !important; border: 2px solid {berni_barna} !important; border-radius: 8px !important; }}
-        .stButton>button {{ background-color: {berni_feher} !important; color: {berni_fekete} !important; border: 3px solid {berni_barna} !important; border-radius: 12px !important; font-weight: bold; width: 100%; }}
-        .stButton>button:hover {{ background-color: {berni_barna} !important; color: {berni_feher} !important; }}
-        h1, h2, h3 {{ color: {berni_feher} !important; text-shadow: 2px 2px {berni_barna}; font-family: 'Georgia', serif; text-align: center; }}
-        .stTabs [data-baseweb="tab"] {{ color: {berni_feher} !important; }}
+        .stApp {{ background-color: #121212 !important; background-image: url("{tappancs_svg}"); color: white; border: 10px solid {berni_barna}; }}
+        .stButton>button {{ background-color: white !important; color: #121212 !important; border: 3px solid {berni_barna} !important; border-radius: 12px !important; }}
+        h1, h2, h3 {{ color: white !important; text-shadow: 2px 2px {berni_barna}; }}
         </style>
     """, unsafe_allow_html=True)
 
@@ -160,6 +131,7 @@ df_fixek = load_data(CSV_URL_FIXEK)
 st.title(f"{'⚡ TERMINÁL: ' if user == '👤 Andris' else '🏇 KASTÉLY: '} Üdvözlünk, {user}!")
 if st.button("🚪 Kijelentkezés"):
     del st.session_state.user
+    if 'animated' in st.session_state: del st.session_state.animated
     st.rerun()
 
 tab1, tab2, tab3 = st.tabs(["📝 Könyvelés", "📊 Statisztika", "📅 Adatbázis"])
@@ -177,13 +149,9 @@ with tab1:
             valuta = v_c1.selectbox("Pénznem", ["HUF", "EUR"])
             osszeg = v_c2.number_input("Összeg", min_value=0.0)
             megj = st.text_input("Megjegyzés")
-            submit_label = "💾 ADAT BEFŰZÉSE" if user == "👤 Andris" else "✨ KINCSTÁRBA HELYEZÉS"
-            if st.form_submit_button(submit_label):
+            if st.form_submit_button("Mentés"):
                 final = int(osszeg if valuta == "HUF" else osszeg * rate)
-                requests.post(SCRIPT_URL, json={
-                    "is_fix": False, "datum": str(d), "tipus": t, 
-                    "szemely": user, "kategoria": k, "osszeg": final, "megjegyzes": megj
-                })
+                requests.post(SCRIPT_URL, json={"is_fix": False, "datum": str(d), "tipus": t, "szemely": user, "kategoria": k, "osszeg": final, "megjegyzes": megj})
                 st.success("Sikeres mentés!")
                 st.rerun()
 
@@ -194,7 +162,7 @@ with tab1:
             f_kat = st.selectbox("Kategória", ["🏠 Lakás/Rezsi", "🏦 Hitel", "💰 Megtakarítás", "📦 Egyéb"])
             f_osszeg = st.number_input("HUF", min_value=0)
             f_d = st.date_input("Nap", datetime.now())
-            if st.form_submit_button("📜 RÖGZÍTÉS"):
+            if st.form_submit_button("Rögzítés"):
                 requests.post(SCRIPT_URL, json={"is_fix":True, "nev":f_nev, "kategoria":f_kat, "osszeg":int(f_osszeg), "datum":str(f_d)})
                 st.success("Fix tétel ütemezve!")
                 st.rerun()
@@ -206,8 +174,7 @@ with tab2:
         if not kiadas_df.empty:
             c_a, c_b = st.columns(2)
             pie_color = px.colors.sequential.Greens if user == "👤 Andris" else px.colors.sequential.RdPu
-            with c_a: 
-                st.plotly_chart(px.pie(kiadas_df, values='osszeg', names='kategoria', title="Kiadások", color_discrete_sequence=pie_color), use_container_width=True)
+            with c_a: st.plotly_chart(px.pie(kiadas_df, values='osszeg', names='kategoria', title="Kiadások", color_discrete_sequence=pie_color), use_container_width=True)
             with c_b:
                 kiadas_df['honap'] = pd.to_datetime(kiadas_df['datum']).dt.strftime('%Y-%m')
                 st.plotly_chart(px.line(kiadas_df.groupby('honap')['osszeg'].sum().reset_index(), x='honap', y='osszeg', title="Havi trend"), use_container_width=True)
@@ -218,24 +185,19 @@ with tab3:
         st.dataframe(df_main.head(30), use_container_width=True)
         st.divider()
         st.subheader("🗑️ Sor törlése")
-        row_to_delete = st.number_input("Törlendő sor indexe (a táblázat bal szélén látható szám):", min_value=0, max_value=len(df_main)-1, step=1)
-        
-        if st.button("❌ VÉGLEGES TÖRLÉS", use_container_width=True):
+        row_to_delete = st.number_input("Törlendő sor indexe:", min_value=0, max_value=len(df_main)-1, step=1)
+        if st.button("❌ VÉGLEGES TÖRLÉS"):
             res = requests.post(SCRIPT_URL, json={"action": "delete", "row_index": int(row_to_delete)})
-            if "Törlés sikeres" in res.text:
-                st.success(f"Sor törölve! (Index: {row_to_delete})")
+            if "Törlés" in res.text or res.status_code == 200:
+                st.success("Törölve!")
                 st.cache_data.clear()
                 st.rerun()
-            else:
-                st.error(f"Hiba történt: {res.text}")
     else:
-        st.info("A táblázat üres, nincs mit törölni.")
+        st.info("Üres a táblázat.")
 
 # --- LÁTVÁNY ELEMEK ---
+st.divider()
 if user == "👤 Zsóka":
-    msgs = ["Micsoda elegancia!", "A parpák már várnak!", "Ragyogó könyvelés, Zsóka!", "Minden aranyad biztonságban!"]
-    st.divider()
-    st.markdown(f"<h3 style='text-align: center;'>🏇 {random.choice(msgs)}</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='text-align: center;'>🏇 {random.choice(['Micsoda elegancia!', 'Ragyogó könyvelés!', 'Biztonságban az arany!'])}</h3>", unsafe_allow_html=True)
 else:
-    st.divider()
-    st.markdown("<p style='text-align: center; color: #00F2FF;'>[ SYSTEM OK ] _ Data stream integrity: 100% _ Access granted.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #00F2FF;'>[ SYSTEM OK ] _ Data stream integrity: 100%</p>", unsafe_allow_html=True)
