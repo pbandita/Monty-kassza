@@ -9,7 +9,7 @@ import io
 st.set_page_config(page_title="Andris & Zsóka Kassza", layout="wide", page_icon="💰")
 px.defaults.template = "plotly_dark"
 
-SHEET_ID = "1sk5Lg03WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ"
+SHEET_ID = "1sk5LgO3WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ"
 # FONTOS: Ellenőrizd a gid-eket a böngészőben!
 CSV_URL_MAIN = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=0"
 CSV_URL_FIXEK = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=1493472585" 
