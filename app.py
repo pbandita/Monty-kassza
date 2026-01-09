@@ -10,7 +10,7 @@ import io
 st.set_page_config(page_title="Andris & Zsóka Kassza", layout="wide", page_icon="💰")
 px.defaults.template = "plotly_dark"
 
-SHEET_ID = "1vSj9ExuUUiQKDmQBZt7KYfFatjfROEW1dj"
+SHEET_ID = "1sk5LgO3WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ"
 CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyHCbk2E4E01AQflCl4K9qYH-GXPSuzHHU0yMS7XhATHkBnb7Gy87EFcdGDrAmrnU68w/exec"
 
