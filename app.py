@@ -211,6 +211,7 @@ with tab3:
 # --- LÁTVÁNY ELEMEK ---
 st.divider()
 if user == "👤 Zsóka":
-    st.markdown(f"<h3 style='text-align: center;'>🏇 {random.choice(['Micsoda elegancia!', 'Ragyogó könyvelés!', 'Biztonságban az arany!'])}</h3>", unsafe_allow_html=True)
+    fact = get_animal_fact() 
+    st.markdown(f"<h3 style='text-align: center; color: #A0522D;'>✨ {fact} ✨</h3>", unsafe_allow_html=True)
 else:
     st.markdown("<p style='text-align: center; color: #00F2FF;'>[ SYSTEM OK ] _ Data stream integrity: 100%</p>", unsafe_allow_html=True)
