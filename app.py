@@ -49,9 +49,9 @@ if user == "👤 Andris":
 else:
     # --- Színbeállítások Zsókának ---
     primary_color = "#2E7D32" # Középzöld (Gombok és címek)
-    bg_color = "#1B5E20"      # Nagyon sötétzöld (Oldal háttér)
-    input_bg = "#388E3C"      # Világosabb zöld (A beviteli mezők belseje)
-    border_color = "#4CAF50"  # Élénkzöld (A külső keret színe)
+    bg_color = "##805603"      # Nagyon sötétzöld (Oldal háttér)
+    input_bg = "#1B5E20"      # Világosabb zöld (A beviteli mezők belseje)
+    border_color = "#1B5E20"  # Élénkzöld (A külső keret színe)
 
     st.markdown(f"""
         <style>
