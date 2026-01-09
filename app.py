@@ -80,7 +80,6 @@ else:
         .stTabs [data-baseweb="tab"] {{ color: {berni_feher} !important; }}
         </style>
     """, unsafe_allow_html=True)
-
 # --- ADATOK BETÖLTÉSE ---
 @st.cache_data(ttl=600)
 def get_rate():
