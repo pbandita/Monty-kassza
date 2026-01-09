@@ -120,3 +120,42 @@ with tab2:
         if not kiadas_df.empty:
             c1, c2 = st.columns(2)
             with c1:
+                st.plotly_chart(px.pie(kiadas_df, values='osszeg', names='kategoria', title="Kiadások megoszlása"), use_container_width=True)
+            with c2:
+                kiadas_df['honap'] = pd.to_datetime(kiadas_df['datum']).dt.strftime('%Y-%m')
+                trend = kiadas_df.groupby('honap')['osszeg'].sum().reset_index()
+                st.plotly_chart(px.line(trend, x='honap', y='osszeg', title="Havi költés alakulása", markers=True), use_container_width=True)
+        else:
+            st.warning("Nincs megjeleníthető kiadás.")
+    else:
+        st.error("A tranzakciós táblázat üres vagy nem elérhető.")
+
+with tab3:
+    st.subheader("📅 Adatok áttekintése")
+    st.write("**Fixek a felhőben (Google Sheet 2):**")
+    if not df_fixek.empty:
+        st.dataframe(df_fixek, use_container_width=True)
+    else:
+        st.info("Nincs rögzített fix tétel a 'Fixek' fülön.")
+    
+    st.divider()
+    st.write("**Utolsó tranzakciók (Google Sheet 1):**")
+    st.dataframe(df_main.sort_values('datum', ascending=False).head(20), use_container_width=True)
+
+# --- Zsóka Lovasa (Easter Egg) ---
+st.divider()
+knight_messages = [
+    "Jó estét, Zsóka! Az arany biztonságban van!",
+    "Figyelmed éles, mint a penge, Zsóka! Minden garas a helyén?",
+    "Hű lovagod jelentkezik, Zsóka! Milyen kalandok várnak ma?",
+    "A kincstár csillog, mint a hajnali harmat, Zsóka!",
+    "Bátorságod példaértékű, Zsóka! Hajrá a spóroláshoz!",
+    "Monty már várja a sétát, Zsóka!",
+    "Egy gondos gazdasszony vagy, Zsóka! Ez a kincstár a tiéd!"
+]
+
+col_knight1, col_knight2 = st.columns([1, 10])
+with col_knight1:
+    st.markdown("🏇") # Lovas emoji
+with col_knight2:
+    st.caption(f"**A Kincstár Őre:** _{random.choice(knight_messages)}_")
