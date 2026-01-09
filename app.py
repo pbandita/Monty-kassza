@@ -38,6 +38,7 @@ if 'animated' not in st.session_state:
     
     if st.session_state.user == "👤 Andris":
         with placeholder.container():
+            # A te már bevált terminálos betöltésed
             lines = [
                 "> BOOTING SYSTEM...",
                 "> CONNECTING TO SECURE DATABASE...",
@@ -56,22 +57,41 @@ if 'animated' not in st.session_state:
             time.sleep(0.5)
             
     else:
-        # ZSÓKA ANIMÁCIÓ + VONULÓ TAPPANCSOK
+        # ZSÓKA ÚJ ANIMÁCIÓJA: ÁLLATNYOM INVÁZIÓ
         with placeholder.container():
             st.markdown("<h2 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h2>", unsafe_allow_html=True)
-            tappancs_container = st.empty()
-            tappancsok = ""
-            for i in range(1, 11):
-                tappancsok += "🐾 "
-                tappancs_container.markdown(f"<div style='font-size: 50px; text-align: center; letter-spacing: 20px;'>{tappancsok}</div>", unsafe_allow_html=True)
-                time.sleep(0.3)
-            # Biztonságos GIF link (Monty ugrál)
-            st.markdown("<div style='display: flex; justify-content: center;'><img src='https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2ZicGZicGZicGZicGZicGZicGZicGZicGZicGZicGZicGZicGZpJmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/5AtX86f3fDfyE/giphy.gif' width='150'></div>", unsafe_allow_html=True)
+            
+            # Különböző lábnyomok listája
+            nyomok = ["🐾", "👣", "🐾", "🐈", "🐕", "🦜", "🦴"]
+            
+            # Üres terület a nyomoknak
+            nyom_area = st.empty()
+            felirat_lista = []
+            
+            # Egyre gyorsuló ciklus (a sleep idő csökken)
+            for i in range(25):
+                # Véletlenszerű nyom és pozíció (HTML/CSS-el megoldva)
+                nyom = random.choice(nyomok)
+                meret = random.randint(20, 70)
+                bal = random.randint(5, 90) # vízszintes helyzet %-ban
+                fent = random.randint(0, 50) # függőleges helyzet
+                szin = random.choice(["#A0522D", "#FFFFFF", "#D2691E"]) # barna árnyalatok
+                
+                uj_nyom = f"""<div style='position: absolute; left: {bal}%; top: {fent}px; font-size: {meret}px; color: {szin}; opacity: 0.8; transition: all 0.3s;'>{nyom}</div>"""
+                felirat_lista.append(uj_nyom)
+                
+                # Megjelenítjük az összes eddigi nyomot
+                nyom_area.markdown(f"<div style='position: relative; height: 150px;'>{''.join(felirat_lista)}</div>", unsafe_allow_html=True)
+                
+                # Egyre gyorsul: 0.3 másodpercről lemegy 0.05-re
+                wait_time = max(0.05, 0.3 - (i * 0.02))
+                time.sleep(wait_time)
+            
             st.markdown("<h3 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h3>", unsafe_allow_html=True)
-            time.sleep(0.8)
+            time.sleep(1.2)
 
     st.session_state.animated = True
-    placeholder.empty() # Fontos: Ez tünteti el az animációt a belépés után!
+    placeholder.empty() # Itt takarítjuk el az egészet a végén
 
 # --- USER SPECIFIKUS DESIGN ---
 user = st.session_state.user
