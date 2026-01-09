@@ -47,51 +47,63 @@ if user == "👤 Andris":
         </style>
     """, unsafe_allow_html=True)
 else:
-    # --- Színbeállítások Zsókának ---
-    primary_color = "#2E7D32" # Középzöld (Gombok és címek)
-    bg_color = "#805603"      # Nagyon sötétzöld (Oldal háttér)
-    input_bg = "#1B5E20"      # Világosabb zöld (A beviteli mezők belseje)
-    border_color = "#1B5E20"  # Élénkzöld (A külső keret színe)
+    # --- Természetközeli / Antik színek Zsókának ---
+    primary_color = "#2E4F23" # Mély erdőzöld
+    bg_color = "#F5F5DC"      # Bézs/Pergamen alap (jobban mutat a zölddel)
+    input_bg = "#E8F5E9"      # Nagyon halvány zöld a mezőknek
+    border_color = "#556B2F"  # Sötét olivazöld (antik hatás)
 
     st.markdown(f"""
         <style>
-        
+        /* 1. AZ EGÉSZ OLDAL ANTIK KERETE */
         .stApp {{ 
             background-color: {bg_color}; 
-            color: #FFFFFF;
-            border: 10px solid {border_color}; 
+            color: #2E4F23;
+            /* Dupla keret az antik hatáshoz */
+            border: 15px double {border_color}; 
+            padding: 10px;
             box-sizing: border-box;
         }}
 
-        
+        /* 2. TERMÉSZETKÖZELI BEVITELI MEZŐK */
         input, div[data-baseweb="select"] > div, textarea, .stNumberInput input {{
             background-color: {input_bg} !important;
-            color: white !important;
-            border: 1px solid {border_color} !important;
-            border-radius: 5px;
+            color: #1B5E20 !important;
+            border: 2px solid #A5D6A7 !important;
+            border-radius: 15px !important; /* Lekerekített, puhább formák */
         }}
 
-        
+        /* 3. GOMBOK - LEVÉL FORMÁRA EMLÉKEZTETŐ */
         .stButton>button {{ 
             background-color: {primary_color} !important; 
-            color: white !important; 
-            border-radius: 20px !important; 
+            color: #F1F8E9 !important; 
+            border-radius: 50px 5px 50px 5px !important; /* Aszimmetrikus, levél alakú gomb */
             border: 2px solid {border_color} !important;
             font-weight: bold;
+            transition: 0.3s;
+        }}
+        
+        .stButton>button:hover {{
+            background-color: #556B2F !important;
+            transform: scale(1.02);
         }}
 
-    
+        /* 4. ANTIK FEJLÉCEK */
         h1, h2, h3 {{ 
-            color: #C8E6C9 !important; /
-            font-family: 'Palatino', serif; 
+            color: {primary_color} !important; 
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            border-bottom: 1px solid {border_color};
+            display: inline-block;
         }}
 
-        /* 5. TÁBLÁZAT ÉS TABS SZÍNEK */
-        .stTabs [data-baseweb="tab"] {{ color: {primary_color} !important; }}
-        .stDataFrame {{ background-color: {input_bg} !important; }}
+        /* 5. TABS - TERMÉSZETES SZÍNEK */
+        .stTabs [data-baseweb="tab"] {{ 
+            color: {primary_color} !important;
+            font-weight: bold;
+        }}
         </style>
     """, unsafe_allow_html=True)
-
 # --- ADATOK BETÖLTÉSE ---
 @st.cache_data(ttl=600)
 def get_rate():
