@@ -87,7 +87,7 @@ else:
         }}
 
         /* 5. TÁBLÁZAT ÉS TABS SZÍNEK */
-        .stTabs [data-baseweb="tab"] {{ color: {border_color} !important; }}
+        .stTabs [data-baseweb="tab"] {{ color: {primary_color} !important; }}
         .stDataFrame {{ background-color: {input_bg} !important; }}
         </style>
     """, unsafe_allow_html=True)
