@@ -59,51 +59,49 @@ if 'animated' not in st.session_state:
     else:
         # ZSÓKA ANIMÁCIÓ + TELJES KÉPERNYŐS INVÁZIÓ
         with placeholder.container():
-            # Egy háttér-konténert hozunk létre az egésznek
             st.markdown("<h1 style='text-align:center; margin-top: 50px;'>🏰 A kastély kapui megnyílnak...</h1>", unsafe_allow_html=True)
             
-            # Bővített szimbólum készlet
-            nyomok = ["🐾", "🐎", "🦴", "🧶", "🦜", "🐈", "🐶", "👣", "✨"]
+            # Kibővített szimbólum készlet: tappancs, patkó, csont, gombolyag, madárnyom
+            nyomok = ["🐾", "🐎", "🦴", "🧶", "🦜", "🐈", "🐶", "👣", "✨", "🐣", "👟"]
             
-            # Terület a káosznak
             kaosz_area = st.empty()
             elemek_html = []
             
-            # Több elem (50 db), hogy tényleg tele legyen a képernyő
-            for i in range(50):
+            # 60 elemre emeltem a számot a sűrűbb hatásért
+            for i in range(60):
                 nyom = random.choice(nyomok)
-                # Véletlenszerű elhelyezés az egész képernyőn
-                # A viewport szélesség (vw) és magasság (vh) %-ában számolunk
-                bal = random.randint(5, 90)
-                fent = random.randint(-100, 400) # pixelben a cím alatt
-                meret = random.randint(30, 80)
-                fordulat = random.randint(-45, 45) # kicsit megdöntjük őket
+                bal = random.randint(2, 95) # Teljes szélesség kihasználása
+                # A képernyő tetejétől az aljáig szórjuk (vh = viewport height)
+                fent = random.randint(10, 80) 
+                meret = random.randint(35, 90) # Kicsit nagyobb méretek
+                fordulat = random.randint(-60, 60) # Erősebb dőlésszög
                 
                 uj_elem = f"""
                 <div style='
-                    position: absolute; 
+                    position: fixed; 
                     left: {bal}vw; 
-                    top: {fent}px; 
+                    top: {fent}vh; 
                     font-size: {meret}px; 
                     transform: rotate({fordulat}deg);
-                    z-index: 100;
+                    z-index: 9999;
                     opacity: 0.9;
-                    transition: all 0.2s ease-out;
+                    pointer-events: none;
+                    transition: all 0.1s ease-out;
                 '>
                     {nyom}
                 </div>
                 """
                 elemek_html.append(uj_elem)
                 
-                # Kirajzoljuk az összes eddigi elemet egyetlen HTML blokkban
-                kaosz_area.markdown(f"<div style='position: relative; width: 100%; height: 500px;'>{''.join(elemek_html)}</div>", unsafe_allow_html=True)
+                # Kirajzoljuk az összes eddigi elemet
+                kaosz_area.markdown(f"<div>{''.join(elemek_html)}</div>", unsafe_allow_html=True)
                 
-                # Folyamatosan gyorsuló ütem
-                wait_time = max(0.01, 0.2 - (i * 0.005))
+                # Még gyorsabb tempó a végére
+                wait_time = max(0.005, 0.15 - (i * 0.004))
                 time.sleep(wait_time)
             
-            st.markdown("<h2 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h2>", unsafe_allow_html=True)
-            time.sleep(1.5)
+            st.markdown("<h2 style='text-align:center; position: relative; z-index: 10000;'>Üdvözlünk itthon, Zsóka!</h2>", unsafe_allow_html=True)
+            time.sleep(1.8)
 
     st.session_state.animated = True
     placeholder.empty() # Itt takarítunk ki!
