@@ -56,13 +56,11 @@ if 'animated' not in st.session_state:
             time.sleep(0.5)
             
     else:
-        # ZSÓKA ANIMÁCIÓ + TELJES KÉPERNYŐS INVÁZIÓ
+        # ZSÓKA ANIMÁCIÓ + TELJES KÉPERNYŐS INVÁZIÓ (JAVÍTOTT VERZIÓ)
         with placeholder.container():
             st.markdown("<h1 style='text-align:center; margin-top: 50px;'>🏰 A kastély kapui megnyílnak...</h1>", unsafe_allow_html=True)
             
-            # Kibővített szimbólum készlet
             nyomok = ["🐾", "🐎", "🦴", "🧶", "🦜", "🐈", "🐶", "👣", "✨", "🐣", "👟"]
-            
             kaosz_area = st.empty()
             elemek_html = []
             
@@ -73,32 +71,33 @@ if 'animated' not in st.session_state:
                 meret = random.randint(35, 90)
                 fordulat = random.randint(-60, 60)
                 
+                # Itt a titok: minden elemet egy abszolút pozícionált div-be teszünk
                 uj_elem = f"""
-                <div style='
+                <span style='
                     position: fixed; 
                     left: {bal}vw; 
                     top: {fent}vh; 
                     font-size: {meret}px; 
                     transform: rotate({fordulat}deg);
-                    z-index: 9999;
-                    opacity: 0.9;
+                    z-index: {9999 + i};
                     pointer-events: none;
-                    transition: all 0.1s ease-out;
-                '>
-                    {nyom}
-                </div>
+                '>{nyom}</span>
                 """
                 elemek_html.append(uj_elem)
                 
-                # JAVÍTVA: Mindig kell az unsafe_allow_html=True!
-                kaosz_area.markdown(f"<div>{''.join(elemek_html)}</div>", unsafe_allow_html=True)
+                # Összefűzzük az összes eddigi elemet
+                teljes_html = "".join(elemek_html)
                 
-                wait_time = max(0.005, 0.15 - (i * 0.004))
+                # A st.write helyett st.components.v1.html-t vagy sima st.markdown-t használunk, 
+                # de most egy burkoló div-be zárjuk az egészet
+                kaosz_area.markdown(f"<div>{teljes_html}</div>", unsafe_allow_html=True)
+                
+                wait_time = max(0.005, 0.12 - (i * 0.003))
                 time.sleep(wait_time)
             
             st.markdown("<h2 style='text-align:center; position: relative; z-index: 10000;'>Üdvözlünk itthon, Zsóka!</h2>", unsafe_allow_html=True)
             time.sleep(1.8)
-
+            
     st.session_state.animated = True
     placeholder.empty()
 
