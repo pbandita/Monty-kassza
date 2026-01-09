@@ -47,8 +47,8 @@ if user == "👤 Andris":
         </style>
     """, unsafe_allow_html=True)
 else:
-    primary_color = "#8B4513" # Arany
-    bg_color = "#FDF5E6" # Halvány rózsaszín
+    primary_color = "#024d01" # Arany
+    bg_color = "#8B4513" # Halvány rózsaszín
     st.markdown(f"""
         <style>
         .stApp {{ background-color: {bg_color}; color: #5D4037; }}
