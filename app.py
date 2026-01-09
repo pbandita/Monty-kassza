@@ -72,6 +72,22 @@ if 'animated' not in st.session_state:
 
     st.session_state.animated = True
     placeholder.empty() # Töröljük az animációt, hogy jöhessen a valódi felület
+            
+    else:
+        # ZSÓKA ANIMÁCIÓ + UGRÁLÓ KUTYUS
+        with placeholder.container():
+            st.markdown("<h2 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h2>", unsafe_allow_html=True)
+            # Itt egy ugráló Berni kutyus GIF (Lottie helyett egyszerűbb egy jó minőségű GIF)
+            st.markdown("![Berni](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJic2t6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/5AtX86f3fDfyE/giphy.gif)", unsafe_allow_html=True)
+            bar = st.progress(0)
+            for i in range(100):
+                time.sleep(0.02)
+                bar.progress(i + 1)
+            st.markdown("<h3 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h3>", unsafe_allow_html=True)
+            time.sleep(1)
+
+    st.session_state.animated = True
+    placeholder.empty() # Töröljük az animációt, hogy jöhessen a valódi felület
 
 # --- USER SPECIFIKUS DESIGN ---
 user = st.session_state.user
