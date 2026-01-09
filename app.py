@@ -43,17 +43,17 @@ if user == "👤 Andris":
         <style>
         .stApp {{ background-color: {bg_color}; color: {primary_color}; font-family: 'Courier New', monospace; }}
         .stButton>button {{ border: 2px solid {primary_color} !important; color: {primary_color} !important; background-color: black !important; }}
-        h1, h2, h3 {{ color: {primary_color} !important; text-shadow: 2px 2px 5px #000; }}
+        h1, h2, h3 {{ color: {primary_color} !important; text-shadow: 2px 2px 5px #000; font-family: 'Monaco', monospace !important }}
         </style>
     """, unsafe_allow_html=True)
 else:
-    primary_color = "#024d01" # Arany
+    primary_color = "#f7f0e4" # Arany
     bg_color = "#8B4513" # Halvány rózsaszín
     st.markdown(f"""
         <style>
-        .stApp {{ background-color: {bg_color}; color: #038001; }}
-        .stButton>button {{ background-color: #038001 !important; color: white !important; border-radius: 20px !important; }}
-        h1, h2, h3 {{ color: #038001 !important; font-family: 'Palatino', serif !important; }}
+        .stApp {{ background-color: {bg_color}; color: #f7f0e4; }}
+        .stButton>button {{ background-color: #f7f0e4 !important; color: white !important; border-radius: 20px !important; }}
+        h1, h2, h3 {{ color: #f7f0e4 !important; font-family: 'Palatino', serif !important; }}
         </style>
     """, unsafe_allow_html=True)
 
