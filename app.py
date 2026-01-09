@@ -92,20 +92,31 @@ def load_data(url):
 df_main = load_data(CSV_URL_MAIN)
 df_fixek = load_data(CSV_URL_FIXEK)
 
-def get_animal_fact():
+Python
+
+def get_zsoka_fact():
     try:
-        r = requests.get("https://dogapi.dog/api/v2/facts", timeout=2)
+        r = requests.get("https://dogapi.dog/api/v2/facts", timeout=1)
         return r.json()['data'][0]['attributes']['body']
     except:
-        fallback_facts = [
+        return random.choice([
             "Horses can sleep both standing up and lying down.",
             "A dog's nose print is unique, much like a human's fingerprint.",
-            "Horses have the largest eyes of any land mammal.",
-            "Dogs have three eyelids, including one to keep their eyes moist and protected.",
-            "A horse's heart weighs about 4 to 4.5 kilograms!",
-            "Puppies have 28 teeth, but adult dogs have 42."
-        ]
-        return random.choice(fallback_facts)
+            "Pferde haben das größte Auge aller Landsäugetiere."
+        ])
+
+def get_andris_fact():
+    # Itt egy válogatott lista a te szakmádhoz
+    gyogyped_facts = [
+        "The first manual alphabet for the deaf was developed in the 17th century.",
+        "Neurodiversity emphasizes that neurological differences are natural human variations.",
+        "Tactile signing is a common communication method for people with deaf-blindness.",
+        "Universal Design for Learning (UDL) focuses on creating flexible learning environments.",
+        "Braille was invented by 15-year-old Louis Braille in 1824.",
+        "Early intervention services can significantly improve developmental trajectories.",
+        "The concept of 'Zone of Proximal Development' was introduced by Lev Vygotsky."
+    ]
+    return random.choice(gyogyped_facts)
 # --- USER SPECIFIKUS DESIGN ---
 user = st.session_state.user
 
@@ -221,11 +232,27 @@ with tab3:
             st.rerun()
     else:
         st.info("Üres a táblázat.")
-
+        
 # --- LÁTVÁNY ELEMEK ---
 st.divider()
+
 if user == "👤 Zsóka":
-    fact = get_animal_fact() 
-    st.markdown(f"<h3 style='text-align: center; color: #A0522D;'>✨ {fact} ✨</h3>", unsafe_allow_html=True)
+    fact = get_zsoka_fact()
+    st.markdown(f"""
+        <div style='background-color: rgba(160, 82, 45, 0.1); padding: 15px; border-radius: 15px; border-left: 5px solid #A0522D;'>
+            <h4 style='margin: 0; color: #A0522D;'>🐾 Animal Fun Fact:</h4>
+            <p style='font-style: italic; font-size: 16px; margin-top: 10px;'>"{fact}"</p>
+        </div>
+    """, unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align: center; color: #A0522D;'>🏇 {random.choice(['Micsoda elegancia!', 'Ragyogó könyvelés!', 'Biztonságban az arany!'])}</p>", unsafe_allow_html=True)
+
 else:
-    st.markdown("<p style='text-align: center; color: #00F2FF;'>[ SYSTEM OK ] _ Data stream integrity: 100%</p>", unsafe_allow_html=True)
+    # ANDRIS GYÓGYPED TÉNYEK
+    fact = get_andris_fact()
+    st.markdown(f"""
+        <div style='background-color: rgba(0, 242, 255, 0.05); padding: 15px; border-radius: 10px; border: 1px solid #00F2FF; box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);'>
+            <h4 style='margin: 0; color: #00F2FF;'>🧠 Special Education Fact:</h4>
+            <p style='font-family: monospace; font-size: 16px; margin-top: 10px; color: #00F2FF;'>[ {fact} ]</p>
+        </div>
+    """, unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #00F2FF; font-size: 12px; margin-top: 10px;'>[ SYSTEM INTEGRITY: 100% | KNOWLEDGE BASE UPDATED ]</p>", unsafe_allow_html=True)
