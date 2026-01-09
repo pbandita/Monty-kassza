@@ -37,70 +37,66 @@ if 'user' not in st.session_state:
 user = st.session_state.user
 
 if user == "👤 Andris":
-    # --- Neon Blue Retro Gaming Színek ---
-    neon_kek = "#00F2FF"    # Világító ciánkék / Neon kék
-    retro_fekete = "#050505" # Majdnem teljes fekete
-    grid_szin = "rgba(0, 242, 255, 0.15)" # Neon kék rácsháló
+    # --- Clean Cyber Design ---
+    neon_kek = "#00F2FF"    # Csak a kereteknek és gomboknak
+    retro_fekete = "#050505" 
+    grid_szin = "rgba(0, 242, 255, 0.08)" # Még halványabb rács
+    tiszta_feher = "#FFFFFF"
 
     st.markdown(f"""
         <style>
-        /* 1. RÁCSHÁLÓS HÁTTÉR */
+        /* 1. RÁCSHÁLÓ ÉS ALAP SZÖVEG (FEHÉR) */
         .stApp {{ 
             background-color: {retro_fekete};
             background-image: 
                 linear-gradient({grid_szin} 1px, transparent 1px),
                 linear-gradient(90deg, {grid_szin} 1px, transparent 1px);
-            background-size: 40px 40px; 
-            color: {neon_kek};
-            font-family: 'Lucida Console', Monaco, monospace !important;
+            background-size: 45px 45px; 
+            color: {tiszta_feher};
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
         }}
 
-        /* 2. MEZŐK ÉS TÁBLÁZATOK - KÉK KERETTEL */
+        /* 2. MEZŐK (BOXOK) - KÉK KERETTEL, DE FEHÉR SZÖVEGGEL */
         input, .stNumberInput input, div[data-baseweb="select"] > div, [data-testid="stDataFrame"] {{
-            background-color: rgba(0, 20, 30, 0.9) !important; /* Mélykék fekete belső */
-            color: {neon_kek} !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            color: {tiszta_feher} !important;
             border: 1px solid {neon_kek} !important;
-            border-radius: 0px !important;
-            font-family: 'Lucida Console', Monaco, monospace !important;
-            box-shadow: inset 0 0 5px {neon_kek}; /* Belső izzás a mezőknek */
+            border-radius: 4px !important;
         }}
 
-        /* 3. NEON KÉK GOMBOK */
+        /* 3. NEON KÉK GOMBOK - FEHÉR SZÖVEGGEL */
         .stButton>button {{ 
             background-color: transparent !important; 
-            color: {neon_kek} !important; 
+            color: {tiszta_feher} !important; 
             border: 2px solid {neon_kek} !important;
             border-radius: 4px !important;
-            text-transform: uppercase;
             font-weight: bold;
-            box-shadow: 0 0 15px {neon_kek}; /* Kék neon ragyogás */
-            transition: all 0.3s ease-in-out;
+            box-shadow: 0 0 10px {neon_kek};
         }}
         
         .stButton>button:hover {{
             background-color: {neon_kek} !important;
             color: {retro_fekete} !important;
-            box-shadow: 0 0 30px {neon_kek};
-            transform: translateY(-2px);
         }}
 
-        /* 4. FEJLÉCEK */
+        /* 4. NAGY CÍMEK (FEHÉR) */
         h1, h2, h3 {{ 
-            color: {neon_kek} !important; 
+            color: {tiszta_feher} !important; 
             text-transform: uppercase;
-            letter-spacing: 5px;
-            text-shadow: 0 0 10px {neon_kek};
+            letter-spacing: 2px;
+            /* Csak egy vékony kék alsó vonal a stílus kedvéért */
+            border-bottom: 2px solid {neon_kek};
+            padding-bottom: 10px;
+            font-family: 'Courier New', monospace !important;
         }}
 
         /* 5. TABS */
         .stTabs [data-baseweb="tab"] {{ 
-            color: {neon_kek} !important;
+            color: {tiszta_feher} !important;
         }}
-
-        /* Scrollbar (görgetősáv) testreszabása a kék stílushoz */
-        ::-webkit-scrollbar {{ width: 8px; }}
-        ::-webkit-scrollbar-track {{ background: {retro_fekete}; }}
-        ::-webkit-scrollbar-thumb {{ background: {neon_kek}; border-radius: 10px; }}
+        
+        /* Adattáblázat fejléceinek javítása */
+        th {{ color: {neon_kek} !important; }}
         </style>
     """, unsafe_allow_html=True)
 else:
