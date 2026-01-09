@@ -92,6 +92,20 @@ def load_data(url):
 df_main = load_data(CSV_URL_MAIN)
 df_fixek = load_data(CSV_URL_FIXEK)
 
+def get_animal_fact():
+    try:
+        r = requests.get("https://dogapi.dog/api/v2/facts", timeout=2)
+        return r.json()['data'][0]['attributes']['body']
+    except:
+        fallback_facts = [
+            "Horses can sleep both standing up and lying down.",
+            "A dog's nose print is unique, much like a human's fingerprint.",
+            "Horses have the largest eyes of any land mammal.",
+            "Dogs have three eyelids, including one to keep their eyes moist and protected.",
+            "A horse's heart weighs about 4 to 4.5 kilograms!",
+            "Puppies have 28 teeth, but adult dogs have 42."
+        ]
+        return random.choice(fallback_facts)
 # --- USER SPECIFIKUS DESIGN ---
 user = st.session_state.user
 
