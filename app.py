@@ -47,60 +47,64 @@ if user == "👤 Andris":
         </style>
     """, unsafe_allow_html=True)
 else:
-    # --- Természetközeli / Antik színek Zsókának ---
-    primary_color = "#2E4F23" # Mély erdőzöld
-    bg_color = "#F5F5DC"      # Bézs/Pergamen alap (jobban mutat a zölddel)
-    input_bg = "#E8F5E9"      # Nagyon halvány zöld a mezőknek
-    border_color = "#556B2F"  # Sötét olivazöld (antik hatás)
+    # --- Berni Pásztor Színpaletta ---
+    berni_fekete = "#212121"
+    berni_barna = "#A0522D"
+    berni_feher = "#FFFFFF"
+    
+    # Kényszerítjük a Plotly-t, hogy világos legyen Zsókánál
+    px.defaults.template = "plotly_white"
 
     st.markdown(f"""
         <style>
-        /* 1. AZ EGÉSZ OLDAL ANTIK KERETE */
+        /* Fő háttér és antik keret (Berni barna/fekete) */
         .stApp {{ 
-            background-color: {bg_color}; 
-            color: #2E4F23;
-            /* Dupla keret az antik hatáshoz */
-            border: 15px double {border_color}; 
-            padding: 10px;
+            background-color: #FDFDFD; 
+            color: {berni_fekete};
+            border: 12px double {berni_barna}; 
             box-sizing: border-box;
         }}
 
-        /* 2. TERMÉSZETKÖZELI BEVITELI MEZŐK */
+        /* Beviteli mezők: Fehér alapon barna kerettel */
         input, div[data-baseweb="select"] > div, textarea, .stNumberInput input {{
-            background-color: {input_bg} !important;
-            color: #1B5E20 !important;
-            border: 2px solid #A5D6A7 !important;
-            border-radius: 15px !important; /* Lekerekített, puhább formák */
+            background-color: {berni_feher} !important;
+            color: {berni_fekete} !important;
+            border: 2px solid {berni_barna} !important;
+            border-radius: 10px !important;
         }}
 
-        /* 3. GOMBOK - LEVÉL FORMÁRA EMLÉKEZTETŐ */
+        /* Gombok: Berni fekete, barna szegéllyel */
         .stButton>button {{ 
-            background-color: {primary_color} !important; 
-            color: #F1F8E9 !important; 
-            border-radius: 50px 5px 50px 5px !important; /* Aszimmetrikus, levél alakú gomb */
-            border: 2px solid {border_color} !important;
+            background-color: {berni_fekete} !important; 
+            color: {berni_feher} !important; 
+            border-radius: 15px !important; 
+            border: 3px solid {berni_barna} !important;
             font-weight: bold;
-            transition: 0.3s;
         }}
         
+        /* Gomb hover effekt (Barna lesz ha rátartod) */
         .stButton>button:hover {{
-            background-color: #556B2F !important;
-            transform: scale(1.02);
+            background-color: {berni_barna} !important;
+            color: white !important;
         }}
 
-        /* 4. ANTIK FEJLÉCEK */
+        /* Táblázatok (Dataframe) színeinek kényszerítése */
+        [data-testid="stTable"], [data-testid="stDataFrame"] {{
+            background-color: {berni_feher} !important;
+            color: {berni_fekete} !important;
+            border: 1px solid #DDD;
+        }}
+
+        /* Fejlécek antik betűvel */
         h1, h2, h3 {{ 
-            color: {primary_color} !important; 
+            color: {berni_barna} !important; 
             font-family: 'Georgia', serif;
-            font-style: italic;
-            border-bottom: 1px solid {border_color};
-            display: inline-block;
+            text-align: center;
         }}
 
-        /* 5. TABS - TERMÉSZETES SZÍNEK */
+        /* Fülek (Tabs) */
         .stTabs [data-baseweb="tab"] {{ 
-            color: {primary_color} !important;
-            font-weight: bold;
+            color: {berni_fekete} !important;
         }}
         </style>
     """, unsafe_allow_html=True)
