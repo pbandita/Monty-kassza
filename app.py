@@ -100,7 +100,9 @@ if user == "👤 Andris":
         /* Scrollbar (görgetősáv) testreszabása a kék stílushoz */
         ::-webkit-scrollbar {{ width: 8px; }}
         ::-webkit-scrollbar-track {{ background: {retro_fekete}; }}
-        ::-webkit-scrollbar-thumb {{ background: {neon_
+        ::-webkit-scrollbar-thumb {{ background: {neon_kek}; border-radius: 10px; }}
+        </style>
+    """, unsafe_allow_html=True)
 else:
     # --- Berni Pásztor: Fekete alap, Fehér gombok, Barna keretek ---
     berni_fekete = "#121212" # Mélyfekete háttér
