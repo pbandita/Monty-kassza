@@ -47,26 +47,59 @@ if user == "👤 Andris":
         </style>
     """, unsafe_allow_html=True)
 else:
-    # --- Berni Pásztor Fordított Színpaletta ---
-    berni_fekete = "#0E1117" # Mélyfekete háttér
-    berni_feher  = "#FFFFFF" # Hófehér gombok/szöveg
-    berni_barna  = "#8B4513" # Meleg barna a kereteknek
-
+    # --- Berni Pásztor: Fekete alap, Fehér gombok, Barna keretek ---
+    berni_fekete = "#121212" # Mélyfekete háttér
+    berni_barna  = "#A0522D" # Rozsdabarna keretekhez
+    berni_feher  = "#FFFFFF" # Fehér gombokhoz és szöveghez
+    
     st.markdown(f"""
         <style>
-        /* 1. FŐ HÁTTÉR ÉS ANTIK BARNA KERET */
+        /* 1. FŐ HÁTTÉR ÉS AZ OLDAL KERETE */
         .stApp {{ 
             background-color: {berni_fekete}; 
             color: {berni_feher};
-            border: 10px double {berni_barna}; 
+            border: 10px solid {berni_barna}; 
             box-sizing: border-box;
         }}
 
-        /* 2. BEVITELI MEZŐK: Fekete belső, barna keret, fehér szöveg */
-        input, .stNumberInput input, div[data-baseweb="select"] > div {{
-            background-color: #1A1C23 !important;
+        /* 2. BEVITELI MEZŐK ÉS TÁBLÁZATOK KERETEZÉSE */
+        input, .stNumberInput input, div[data-baseweb="select"] > div, [data-testid="stDataFrame"] {{
+            background-color: #1E1E1E !important; /* Sötétszürke belső */
             color: {berni_feher} !important;
-            border: 2px solid {berni_barna} !important;
+            border: 2px solid {berni_barna} !important; /* BARNA KERET MINDENNEK */
+            border-radius: 8px !important;
+        }}
+
+        /* 3. FEHÉR GOMBOK BARNA SZEGÉLLYEL */
+        .stButton>button {{ 
+            background-color: {berni_feher} !important; 
+            color: {berni_fekete} !important; 
+            border: 3px solid {berni_barna} !important;
+            border-radius: 12px !important;
+            font-weight: bold;
+            width: 100%;
+        }}
+        
+        /* Gomb hover: ha ráviszed az egeret, bebarnul */
+        .stButton>button:hover {{
+            background-color: {berni_barna} !important;
+            color: {berni_feher} !important;
+        }}
+
+        /* 4. FEJLÉCEK ÉS SZÖVEGEK */
+        h1, h2, h3 {{ 
+            color: {berni_feher} !important; 
+            text-shadow: 2px 2px {berni_barna}; /* Egy kis barna árnyék a betűknek */
+            font-family: 'Georgia', serif;
+        }}
+
+        /* 5. TABS (FÜLEK) */
+        .stTabs [data-baseweb="tab"] {{ 
+            color: {berni_feher} !important;
+            border-bottom: 2px solid {berni_barna};
+        }}
+        </style>
+    """, unsafe_allow_html=True)
 # --- ADATOK BETÖLTÉSE ---
 @st.cache_data(ttl=600)
 def get_rate():
