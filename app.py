@@ -10,7 +10,7 @@ st.set_page_config(page_title="Andris & Zsóka Kassza", layout="wide", page_icon
 px.defaults.template = "plotly_dark"
 
 # Google Táblázat adatok (Olvasás és Írás)
-SHEET_ID = "1sk5Lg03WHEq-EtSrK9xSrtAWnAX4fh0_KULE37DraIQ"
+SHEET_ID = "2PACX-1vSj9ExuUUiQKDmQBZt7KYfFatjfROEW1dj-Uazcf7zh33UyUzVPxlxeTvQ5n5bVMrPVz8ayFCPk-fJz"
 CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVwCzkVtBBksB81JOA_CAgfWEgO1xIEsVxTd4rZAPmSgTTJuORLCdLM8xyiR4lDKYQ2A/exec"
 
