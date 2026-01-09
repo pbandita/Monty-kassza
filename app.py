@@ -59,7 +59,7 @@ if user == "👤 Andris":
         /* 2. MEZŐK ÉS TÁBLÁZATOK - KÉK KERETTEL */
         input, .stNumberInput input, div[data-baseweb="select"] > div, [data-testid="stDataFrame"] {{
             background-color: rgba(0, 20, 30, 0.9) !important; /* Mélykék fekete belső */
-            color: {neon_kek} !important;
+            color: {retro_feher} !important;
             border: 1px solid {neon_kek} !important;
             border-radius: 0px !important;
             font-family: 'Lucida Console', Monaco, monospace !important;
