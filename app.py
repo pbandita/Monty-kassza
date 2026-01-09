@@ -42,7 +42,7 @@ with tab1:
             datum = st.date_input("Dátum", datetime.now())
             tipus = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel", "💰 Megtakarítás"])
             szemely = st.selectbox("Ki?", ["👤 Andris", "👤 Zsóka", "👥 Közös"])
-            kategoria = st.selectbox("Kategória", ["🏠 Lakás/Rezsi", "🛒 Élelmiszer", "🏦 Hitel", "🚗 Közlekedés", "🐶 Monty", "💰 Megtakarítás", "📦 Egyéb"])
+            kategoria = st.selectbox("Kategória", ["🏠 Lakás/Rezsi","💵 Fizetés", "🛒 Élelmiszer", "🏦 Hitel", "🚗 Közlekedés", "🐶 Monty", "💰 Megtakarítás", "📦 Egyéb"])
             osszeg = st.number_input("Összeg (HUF)", min_value=0)
             megjegyzes = st.text_input("Megjegyzés")
             if st.form_submit_button("MENTÉS"):
