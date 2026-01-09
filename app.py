@@ -57,41 +57,56 @@ if 'animated' not in st.session_state:
             time.sleep(0.5)
             
     else:
-        # ZSÓKA ÚJ ANIMÁCIÓJA: ÁLLATNYOM INVÁZIÓ
+        # ZSÓKA ANIMÁCIÓ + TELJES KÉPERNYŐS INVÁZIÓ
         with placeholder.container():
-            st.markdown("<h2 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h2>", unsafe_allow_html=True)
+            # Egy háttér-konténert hozunk létre az egésznek
+            st.markdown("<h1 style='text-align:center; margin-top: 50px;'>🏰 A kastély kapui megnyílnak...</h1>", unsafe_allow_html=True)
             
-            # Különböző lábnyomok listája
-            nyomok = ["🐾", "👣", "🐾", "🐈", "🐕", "🦜", "🦴"]
+            # Bővített szimbólum készlet
+            nyomok = ["🐾", "🐎", "🦴", "🧶", "🦜", "🐈", "🐶", "👣", "✨"]
             
-            # Üres terület a nyomoknak
-            nyom_area = st.empty()
-            felirat_lista = []
+            # Terület a káosznak
+            kaosz_area = st.empty()
+            elemek_html = []
             
-            # Egyre gyorsuló ciklus (a sleep idő csökken)
-            for i in range(25):
-                # Véletlenszerű nyom és pozíció (HTML/CSS-el megoldva)
+            # Több elem (50 db), hogy tényleg tele legyen a képernyő
+            for i in range(50):
                 nyom = random.choice(nyomok)
-                meret = random.randint(20, 70)
-                bal = random.randint(5, 90) # vízszintes helyzet %-ban
-                fent = random.randint(0, 50) # függőleges helyzet
-                szin = random.choice(["#A0522D", "#FFFFFF", "#D2691E"]) # barna árnyalatok
+                # Véletlenszerű elhelyezés az egész képernyőn
+                # A viewport szélesség (vw) és magasság (vh) %-ában számolunk
+                bal = random.randint(5, 90)
+                fent = random.randint(-100, 400) # pixelben a cím alatt
+                meret = random.randint(30, 80)
+                fordulat = random.randint(-45, 45) # kicsit megdöntjük őket
                 
-                uj_nyom = f"""<div style='position: absolute; left: {bal}%; top: {fent}px; font-size: {meret}px; color: {szin}; opacity: 0.8; transition: all 0.3s;'>{nyom}</div>"""
-                felirat_lista.append(uj_nyom)
+                uj_elem = f"""
+                <div style='
+                    position: absolute; 
+                    left: {bal}vw; 
+                    top: {fent}px; 
+                    font-size: {meret}px; 
+                    transform: rotate({fordulat}deg);
+                    z-index: 100;
+                    opacity: 0.9;
+                    transition: all 0.2s ease-out;
+                '>
+                    {nyom}
+                </div>
+                """
+                elemek_html.append(uj_elem)
                 
-                # Megjelenítjük az összes eddigi nyomot
-                nyom_area.markdown(f"<div style='position: relative; height: 150px;'>{''.join(felirat_lista)}</div>", unsafe_allow_html=True)
+                # Kirajzoljuk az összes eddigi elemet egyetlen HTML blokkban
+                kaosz_area.markdown(f"<div style='position: relative; width: 100%; height: 500px;'>{''.join(elemek_html)}</div>", unsafe_allow_html=True)
                 
-                # Egyre gyorsul: 0.3 másodpercről lemegy 0.05-re
-                wait_time = max(0.05, 0.3 - (i * 0.02))
+                # Folyamatosan gyorsuló ütem
+                wait_time = max(0.01, 0.2 - (i * 0.005))
                 time.sleep(wait_time)
             
-            st.markdown("<h3 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h3>", unsafe_allow_html=True)
-            time.sleep(1.2)
+            st.markdown("<h2 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h2>", unsafe_allow_html=True)
+            time.sleep(1.5)
 
     st.session_state.animated = True
-    placeholder.empty() # Itt takarítjuk el az egészet a végén
+    placeholder.empty() # Itt takarítunk ki!
 
 # --- USER SPECIFIKUS DESIGN ---
 user = st.session_state.user
