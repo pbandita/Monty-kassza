@@ -47,55 +47,26 @@ if user == "👤 Andris":
         </style>
     """, unsafe_allow_html=True)
 else:
-    # --- Berni Pásztor Színpaletta (Helyes kódokkal) ---
-    berni_fekete = "#212121"
-    berni_barna  = "#A0522D" # Rozsdabarna
-    berni_feher  = "#FFFFFF" # Hófehér
-    
+    # --- Berni Pásztor Fordított Színpaletta ---
+    berni_fekete = "#0E1117" # Mélyfekete háttér
+    berni_feher  = "#FFFFFF" # Hófehér gombok/szöveg
+    berni_barna  = "#8B4513" # Meleg barna a kereteknek
+
     st.markdown(f"""
         <style>
-        /* 1. AZ EGÉSZ OLDAL ÉS KERET */
+        /* 1. FŐ HÁTTÉR ÉS ANTIK BARNA KERET */
         .stApp {{ 
-            background-color: {berni_feher}; 
-            color: {berni_fekete};
-            border: 12px double {berni_barna}; 
+            background-color: {berni_fekete}; 
+            color: {berni_feher};
+            border: 10px double {berni_barna}; 
             box-sizing: border-box;
         }}
 
-        /* 2. BEVITELI MEZŐK HÁTTERE (EZT KERESTED!) */
-        /* A stNumberInput és társai belsejét célozzuk meg */
+        /* 2. BEVITELI MEZŐK: Fekete belső, barna keret, fehér szöveg */
         input, .stNumberInput input, div[data-baseweb="select"] > div {{
-            background-color: #F5F5F5 !important; /* Nagyon világos szürke, hogy elüssön a fehértől */
-            color: {berni_fekete} !important;
+            background-color: #1A1C23 !important;
+            color: {berni_feher} !important;
             border: 2px solid {berni_barna} !important;
-        }}
-
-        /* 3. TÁBLÁZAT (Dataframe) ÉS SZERKESZTŐ */
-        /* Ez a rész felel a táblázatok hátteréért */
-        [data-testid="stDataFrame"], [data-testid="stTable"], .stTable {{
-            background-color: {berni_feher} !important;
-            border: 1px solid {berni_barna} !important;
-        }}
-        
-        /* A táblázat celláinak kényszerítése (ha még mindig fekete lenne) */
-        .dg, .ds {{ background-color: {berni_feher} !important; }}
-
-        /* 4. GOMBOK */
-        .stButton>button {{ 
-            background-color: {berni_fekete} !important; 
-            color: {berni_feher} !important; 
-            border: 3px solid {berni_barna} !important;
-            border-radius: 15px !important;
-            font-weight: bold;
-        }}
-
-        /* 5. CÍMEK */
-        h1, h2, h3 {{ 
-            color: {berni_barna} !important; 
-            font-family: 'Georgia', serif;
-        }}
-        </style>
-    """, unsafe_allow_html=True)
 # --- ADATOK BETÖLTÉSE ---
 @st.cache_data(ttl=600)
 def get_rate():
