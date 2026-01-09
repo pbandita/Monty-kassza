@@ -51,9 +51,9 @@ else:
     bg_color = "#8B4513" # Halvány rózsaszín
     st.markdown(f"""
         <style>
-        .stApp {{ background-color: {bg_color}; color: #024d01; }}
-        .stButton>button {{ background-color: #024d01 !important; color: white !important; border-radius: 20px !important; }}
-        h1, h2, h3 {{ color: #024d01 !important; font-family: 'Palatino', serif; }}
+        .stApp {{ background-color: {bg_color}; color: #038001; }}
+        .stButton>button {{ background-color: #038001 !important; color: white !important; border-radius: 20px !important; }}
+        h1, h2, h3 {{ color: #038001 !important; font-family: 'Palatino', serif !important; }}
         </style>
     """, unsafe_allow_html=True)
 
