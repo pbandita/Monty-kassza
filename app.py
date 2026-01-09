@@ -52,8 +52,8 @@ else:
     st.markdown(f"""
         <style>
         .stApp {{ background-color: {bg_color}; color: #024d01; }}
-        .stButton>button {{ background-color: #F48FB1 !important; color: white !important; border-radius: 20px !important; }}
-        h1, h2, h3 {{ color: #AD1457 !important; font-family: 'times new roman', serif; }}
+        .stButton>button {{ background-color: #024d01 !important; color: white !important; border-radius: 20px !important; }}
+        h1, h2, h3 {{ color: #024d01 !important; font-family: 'Palatino', serif; }}
         </style>
     """, unsafe_allow_html=True)
 
