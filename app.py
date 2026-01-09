@@ -243,20 +243,36 @@ with tab2:
 with tab3:
     st.write("**Tranzakcióid naplója:**")
     st.dataframe(df_main.sort_values('datum', ascending=False).head(30), use_container_width=True)
-    st.subheader("Sor törlése")
-row_to_delete = st.number_input("Melyik sorszámú sort töröljem?", min_value=0, 
-                                max_value=len(df_main)-1 if not df_main.empty else 0, step=1)
+    st.subheader("Sor törlése a Google Sheets-ből")
 
-if st.button("❌ Kijelölt sor törlése"):
-    if not df_main.empty:
-        # Töröljük a választott indexű sort
-        df_main = df_main.drop(df_main.index[row_to_delete])
-        # Elmentjük a frissített listát a CSV-be
-        df_main.to_csv("expenses.csv", index=False)
-        st.success(f"A(z) {row_to_delete}. sorszámú sor törölve!")
-        st.rerun() # Frissítjük az oldalt, hogy eltűnjön a sor
-    else:
-        st.error("Nincs mit törölni, a lista üres!")
+if not df_main.empty:
+    # Kiválasztjuk a sorszámot (a táblázat bal szélén látható szám)
+    row_to_delete = st.number_input("Törlendő sor száma:", 
+                                    min_value=0, 
+                                    max_value=len(df_main)-1, 
+                                    step=1)
+
+    if st.button("❌ Végleges törlés a táblázatból"):
+        try:
+            # 1. Kapcsolódás a Sheets-hez (ezt a conn-t használod felül is)
+            # A Google Sheets-ben a fejléc az 1. sor, az adatok a 2. sortól indulnak.
+            # Mivel a dataframe indexe 0-tól indul, a Sheets-ben ez a (row_to_delete + 2). sor lesz.
+            sheet_row_index = int(row_to_delete) + 2
+            
+            # 2. Törlés parancs küldése a Google-nek
+            # Itt a 'Sheet1' helyére írd a munkalapod pontos nevét, ha más!
+            conn.delete_rows("Sheet1", row_indices=[sheet_row_index])
+            
+            st.success(f"A(z) {row_to_delete}. sorszámú sor sikeresen törölve a Google táblázatból!")
+            
+            # 3. Gyorsítótár ürítése és oldal újratöltése, hogy az új adatokat lássuk
+            st.cache_data.clear()
+            st.rerun()
+            
+        except Exception as e:
+            st.error(f"Hiba történt a törlés során: {e}")
+else:
+    st.info("A táblázat üres, nincs mit törölni.")
 # --- LÁTVÁNY ELEMEK ---
 if user == "👤 Zsóka":
     msgs = ["Micsoda elegancia!", "A parpák már várnak!", "Ragyogó könyvelés, Zsóka!", "Minden aranyad biztonságban!"]
