@@ -14,7 +14,7 @@ SHEET_ID = "1sk5LgO3WHEq-EtSrK9xSrtAWnAX4fhO_KULE37DraIQ"
 # Ellenőrizd a böngészőben a GID-eket! A fő tábla általában 0, a Fixek más szám.
 CSV_URL_MAIN = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=0"
 CSV_URL_FIXEK = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=1493472585" 
-SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyHCbk2E4E01AQflCl4K9qYH-GXPSuzHHU0yMS7XhATHkBnb7Gy87EFcdGDrAmrnU68w/exec"
+SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_JfS4awJ-4U3AzDhSt91lM0RmeEfNAxKYjqgk5-AxZ5JWUhwG8Xi_DHqjicCWac5Z/exec"
 
 # --- EUR ÁRFOLYAM ---
 @st.cache_data(ttl=3600)
