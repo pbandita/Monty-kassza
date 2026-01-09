@@ -47,63 +47,52 @@ if user == "👤 Andris":
         </style>
     """, unsafe_allow_html=True)
 else:
-    # --- Berni Pásztor Színpaletta ---
+    # --- Berni Pásztor Színpaletta (Helyes kódokkal) ---
     berni_fekete = "#212121"
-    berni_barna = "#FFFFFF"
-    berni_feher = "#A0522D"
+    berni_barna  = "#A0522D" # Rozsdabarna
+    berni_feher  = "#FFFFFF" # Hófehér
     
-
-
     st.markdown(f"""
         <style>
-        /* Fő háttér és antik keret (Berni barna/fekete) */
+        /* 1. AZ EGÉSZ OLDAL ÉS KERET */
         .stApp {{ 
-            background-color: #FDFDFD; 
+            background-color: {berni_feher}; 
             color: {berni_fekete};
             border: 12px double {berni_barna}; 
             box-sizing: border-box;
         }}
 
-        /* Beviteli mezők: Fehér alapon barna kerettel */
-        input, div[data-baseweb="select"] > div, textarea, .stNumberInput input {{
-            background-color: {berni_feher} !important;
+        /* 2. BEVITELI MEZŐK HÁTTERE (EZT KERESTED!) */
+        /* A stNumberInput és társai belsejét célozzuk meg */
+        input, .stNumberInput input, div[data-baseweb="select"] > div {{
+            background-color: #F5F5F5 !important; /* Nagyon világos szürke, hogy elüssön a fehértől */
             color: {berni_fekete} !important;
             border: 2px solid {berni_barna} !important;
-            border-radius: 10px !important;
         }}
 
-        /* Gombok: Berni fekete, barna szegéllyel */
+        /* 3. TÁBLÁZAT (Dataframe) ÉS SZERKESZTŐ */
+        /* Ez a rész felel a táblázatok hátteréért */
+        [data-testid="stDataFrame"], [data-testid="stTable"], .stTable {{
+            background-color: {berni_feher} !important;
+            border: 1px solid {berni_barna} !important;
+        }}
+        
+        /* A táblázat celláinak kényszerítése (ha még mindig fekete lenne) */
+        .dg, .ds {{ background-color: {berni_feher} !important; }}
+
+        /* 4. GOMBOK */
         .stButton>button {{ 
             background-color: {berni_fekete} !important; 
             color: {berni_feher} !important; 
-            border-radius: 15px !important; 
             border: 3px solid {berni_barna} !important;
+            border-radius: 15px !important;
             font-weight: bold;
         }}
-        
-        /* Gomb hover effekt (Barna lesz ha rátartod) */
-        .stButton>button:hover {{
-            background-color: {berni_barna} !important;
-            color: white !important;
-        }}
 
-        /* Táblázatok (Dataframe) színeinek kényszerítése */
-        [data-testid="stTable"], [data-testid="stDataFrame"] {{
-            background-color: {berni_feher} !important;
-            color: {berni_fekete} !important;
-            border: 1px solid #DDD;
-        }}
-
-        /* Fejlécek antik betűvel */
+        /* 5. CÍMEK */
         h1, h2, h3 {{ 
             color: {berni_barna} !important; 
             font-family: 'Georgia', serif;
-            text-align: center;
-        }}
-
-        /* Fülek (Tabs) */
-        .stTabs [data-baseweb="tab"] {{ 
-            color: {berni_fekete} !important;
         }}
         </style>
     """, unsafe_allow_html=True)
