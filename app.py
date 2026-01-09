@@ -20,11 +20,13 @@ def load_data():
         r_url = f"{CSV_URL}&cb={datetime.now().timestamp()}"
         response = requests.get(r_url)
         if response.status_code == 200:
-            df = pd.read_csv(io.StringIO(response.text))
-            # Kényszerített oszlopnevek: biztosítjuk, hogy a Python ezeket lássa
+            # Itt adtuk meg az encoding='utf-8'-at az ékezetek miatt
+            raw_data = response.content.decode('utf-8')
+            df = pd.read_csv(io.StringIO(raw_data))
+            
+            # Oszlopnevek tisztítása
             df.columns = [c.strip().lower() for c in df.columns]
             
-            # Adattípusok javítása
             if 'datum' in df.columns:
                 df['datum'] = pd.to_datetime(df['datum']).dt.date
             if 'osszeg' in df.columns:
@@ -45,7 +47,6 @@ with tab1:
         col1, col2 = st.columns(2)
         with col1:
             datum = st.date_input("Dátum", datetime.now())
-            # Az ikonok maradnak a listában, de a mentésnél és szűrésnél okosabbak leszünk
             tipus_valasztott = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel", "💰 Megtakarítás"])
             szemely = st.selectbox("Személy", ["👤 Andris", "👤 Zsóka", "👥 Közös"])
         with col2:
@@ -64,38 +65,42 @@ with tab1:
                     "megjegyzes": megjegyzes
                 }
                 requests.post(SCRIPT_URL, json=adat)
-                st.success("Adat elküldve!")
+                st.success("Adat elküldve! Frissítsd az oldalt 1 perc múlva.")
                 st.rerun()
 
 with tab2:
     st.subheader("Pénzügyi kimutatások")
     
-    # DEBUG: Itt ellenőrizzük, lát-e egyáltalán valamit a kód
+    if st.button("🔄 Adatok frissítése"):
+        st.rerun()
+
     if df.empty:
         st.error("A táblázat üres vagy nem elérhető!")
     else:
-        # OKOS SZŰRÉS: Nem számít az ikon, csak a szöveg tartalma
-        # Kisbetűssé tesszük a típust és megnézzük, benne van-e a kulcsszó
         df['tipus_clean'] = df['tipus'].astype(str).str.lower()
-        
         kiadas_mask = df['tipus_clean'].str.contains("kiad|megtak", na=False)
         kiadas_df = df[kiadas_mask].copy()
 
         if not kiadas_df.empty:
             c1, c2 = st.columns(2)
             with c1:
-                fig_pie = px.pie(kiadas_df, values='osszeg', names='kategoria', title="Kiadások megoszlása")
+                # Szebb kördiagram
+                fig_pie = px.pie(kiadas_df, values='osszeg', names='kategoria', 
+                                 title="Kiadások megoszlása",
+                                 color_discrete_sequence=px.colors.qualitative.Pastel)
                 st.plotly_chart(fig_pie, use_container_width=True)
             with c2:
+                # Szebb trendvonal
                 kiadas_df['honap'] = pd.to_datetime(kiadas_df['datum']).dt.strftime('%Y-%m')
                 trend = kiadas_df.groupby('honap')['osszeg'].sum().reset_index()
-                fig_line = px.line(trend, x='honap', y='osszeg', title="Havi költés", markers=True)
+                fig_line = px.line(trend, x='honap', y='osszeg', title="Havi költés alakulása", 
+                                   markers=True, line_shape="spline")
                 st.plotly_chart(fig_line, use_container_width=True)
         else:
-            st.warning("Nincs 'Kiadás' vagy 'Megtakarítás' típusú adat a táblázatban!")
-            st.write("A táblázatban lévő típusok:", df['tipus'].unique()) # Ez segít látni, mi van benne valójában
+            st.warning("Nincs megjeleníthető kiadás.")
 
 with tab3:
     st.subheader("Tranzakciók listája")
     if not df.empty:
+        # A dataframe-ben is jobban fognak festeni az ékezetek
         st.dataframe(df.sort_values('datum', ascending=False), use_container_width=True)
