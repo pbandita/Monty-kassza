@@ -4,19 +4,21 @@ import plotly.express as px
 import requests
 from datetime import datetime, timedelta
 import sqlite3
-import random
+import io
 
 # --- 0. ALAPBEÁLLÍTÁSOK ---
-st.set_page_config(page_title="Andris & Zsóka Kassza", layout="wide", page_icon="🐲")
+st.set_page_config(page_title="Andris & Zsóka Kassza", layout="wide", page_icon="💰")
 px.defaults.template = "plotly_dark"
 
-# Google Táblázat adatok
+# AZONOSÍTÓK (A megadott link alapján frissítve)
 SHEET_ID = "1sk5Lg03WHEq-EtSrK9xSrtAWnAX4fh0_KULE37DraIQ"
 CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
+# Ez a korábbi Script URL-ed
 SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyHCbk2E4E01AQflCl4K9qYH-GXPSuzHHU0yMS7XhATHkBnb7Gy87EFcdGDrAmrnU68w/exec"
 
 # --- 1. ADATBÁZIS ÉS ADATOK BETÖLTÉSE ---
 def init_db():
+    """Helyi adatbázis az ismétlődő tételek szabályainak."""
     conn = sqlite3.connect('tervek.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS ismetlodo 
@@ -26,14 +28,21 @@ def init_db():
     conn.close()
 
 def load_data():
+    """Adatok beolvasása a Google Táblázatból."""
     try:
-        refresh_url = f"{CSV_URL}&cache_buster={datetime.now().timestamp()}"
-        df = pd.read_csv(refresh_url)
-        if 'datum' in df.columns:
-            df['datum'] = pd.to_datetime(df['datum']).dt.date
-        if 'osszeg' in df.columns:
-            df['osszeg'] = pd.to_numeric(df['osszeg'], errors='coerce').fillna(0)
-        return df
+        # Cache-buster az azonnali frissítésért
+        refresh_url = f"{CSV_URL}&cb={datetime.now().timestamp()}"
+        response = requests.get(refresh_url)
+        if response.status_code == 200:
+            df = pd.read_csv(io.StringIO(response.text))
+            # Oszlopnevek egységesítése
+            df.columns = [c.strip().lower() for c in df.columns]
+            if 'datum' in df.columns:
+                df['datum'] = pd.to_datetime(df['datum']).dt.date
+            if 'osszeg' in df.columns:
+                df['osszeg'] = pd.to_numeric(df['osszeg'], errors='coerce').fillna(0)
+            return df
+        return pd.DataFrame()
     except:
         return pd.DataFrame(columns=["datum", "tipus", "szemely", "kategoria", "osszeg", "megjegyzes"])
 
@@ -48,7 +57,7 @@ init_db()
 arfolyam = get_eur_huf()
 df = load_data()
 
-# --- 2. AUTOMATIKUS ÜTEMEZÉS ---
+# --- 2. AUTOMATIKUS ÜTEMEZÉS ELLENŐRZÉSE ---
 def auto_check():
     conn = sqlite3.connect('tervek.db')
     szabalyok = pd.read_sql_query("SELECT * FROM ismetlodo", conn)
@@ -56,6 +65,7 @@ def auto_check():
     
     for _, sz in szabalyok.iterrows():
         utolso = datetime.strptime(sz['utolso_datum'], "%Y-%m-%d").date()
+        # Következő hónap azonos napja
         kovetkezo = (utolso.replace(day=1) + timedelta(days=32)).replace(day=min(utolso.day, 28))
         
         if kovetkezo <= ma:
@@ -77,14 +87,14 @@ def auto_check():
 
 auto_check()
 
-# --- 3. FÜLEK ---
-tab1, tab2, tab3 = st.tabs(["⚔️ Könyvelés", "🔮 Kimutatások", "📜 Naptár & Áttekintés"])
+# --- 3. FELÜLET (FÜLEK) ---
+tab1, tab2, tab3 = st.tabs(["📝 Könyvelés", "📊 Kimutatások", "📅 Naptár & Áttekintés"])
 
 with tab1:
     col_bal, col_jobb = st.columns(2)
     
     with col_bal:
-        st.subheader("📦 Mimic Láda (Új tétel)")
+        st.subheader("Új tétel rögzítése")
         with st.form("beviteli_iv", clear_on_submit=True):
             datum = st.date_input("Dátum", datetime.now())
             tipus = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel", "💰 Megtakarítás"])
@@ -95,6 +105,81 @@ with tab1:
             nyers_osszeg = v_col2.number_input("Összeg", min_value=0.0)
             megjegyzes = st.text_input("Megjegyzés")
             
-            # Easter Egg: Mentés gomb Mimic-kel
-            if st.form_submit_button("👅 ELNYELI AZ ARANYAT (MENTÉS)", use_container_width=True):
+            if st.form_submit_button("MENTÉS A TÁBLÁZATBA", use_container_width=True):
                 final_osszeg = int(nyers_osszeg if valuta == "HUF" else nyers_osszeg * arfolyam)
+                res = requests.post(SCRIPT_URL, json={
+                    "datum": datum.strftime("%Y-%m-%d"), "tipus": tipus, "szemely": szemely,
+                    "kategoria": kategoria, "osszeg": final_osszeg, "megjegyzes": megjegyzes
+                })
+                if res.status_code == 200:
+                    st.success(f"Mentve: {final_osszeg:,.0f} Ft")
+                    st.rerun()
+
+    with col_jobb:
+        st.subheader("Ismétlődő fix tételek")
+        with st.form("fix_form", clear_on_submit=True):
+            f_nev = st.text_input("Megnevezés (pl. Albérlet)")
+            f_kat = st.selectbox("Kategória ", ["🏠 Lakás/Rezsi", "🏦 Hitel", "💰 Megtakarítás"])
+            f_osszeg = st.number_input("Havi fix összeg (HUF)", min_value=0)
+            f_datum = st.date_input("Levonás napja (első)", datetime.now())
+            if st.form_submit_button("FIX ÜTEMEZÉS MENTÉSE", use_container_width=True):
+                conn = sqlite3.connect('tervek.db')
+                conn.execute("INSERT INTO ismetlodo (nev, kategoria, osszeg, utolso_datum) VALUES (?,?,?,?)",
+                             (f_nev, f_kat, f_osszeg, f_datum.strftime("%Y-%m-%d")))
+                conn.commit()
+                conn.close()
+                st.info("Havi ütemezés rögzítve.")
+
+with tab2:
+    st.subheader("Pénzügyi kimutatások")
+    if st.button("Adatok frissítése"):
+        st.cache_data.clear()
+        st.rerun()
+
+    if not df.empty and len(df) > 0:
+        # Csak a kiadások és megtakarítások a grafikonhoz
+        kiadas_df = df[df['tipus'].str.contains("Kiadás|Megtakarítás", case=False, na=False)].copy()
+        
+        if not kiadas_df.empty:
+            c1, c2 = st.columns(2)
+            with c1:
+                st.write("**Kiadások kategóriánként**")
+                st.plotly_chart(px.pie(kiadas_df, values='osszeg', names='kategoria', hole=0.4), use_container_width=True)
+            with c2:
+                st.write("**Havi trend (Összesen)**")
+                df['honap'] = pd.to_datetime(df['datum']).dt.strftime('%Y-%m')
+                trend = kiadas_df.groupby('honap')['osszeg'].sum().reset_index()
+                st.plotly_chart(px.line(trend, x="honap", y="osszeg", markers=True), use_container_width=True)
+        else:
+            st.info("Nincs adat a grafikonokhoz.")
+
+with tab3:
+    st.subheader("Naptár és Tranzakciók")
+    # Fixek ellenőrzése
+    fix_nevek = ["Lakbér", "Hitel", "Internet", "Villany"]
+    ma = datetime.now()
+    e_havi = df[(pd.to_datetime(df['datum']).dt.month == ma.month)] if not df.empty else pd.DataFrame()
+    
+    st.write(f"Havi fixek állapota ({ma.strftime('%B')}):")
+    f_cols = st.columns(len(fix_nevek))
+    for i, f_nev in enumerate(fix_nevek):
+        pipa = any(e_havi['megjegyzes'].str.contains(f_nev, case=False, na=False)) if not e_havi.empty else False
+        if pipa: f_cols[i].success(f"✅ {f_nev}")
+        else: f_cols[i].error(f"❌ {f_nev}")
+
+    st.divider()
+    st.write("Utolsó tranzakciók:")
+    st.dataframe(df.sort_values('datum', ascending=False), use_container_width=True)
+    
+    # Fixek listája törlési lehetőséggel
+    st.write("Aktív ütemezések:")
+    conn = sqlite3.connect('tervek.db')
+    fixek_list = pd.read_sql_query("SELECT id, nev, osszeg FROM ismetlodo", conn)
+    conn.close()
+    st.table(fixek_list)
+    if st.button("Utolsó ütemezés törlése"):
+        conn = sqlite3.connect('tervek.db')
+        conn.execute("DELETE FROM ismetlodo WHERE id = (SELECT MAX(id) FROM ismetlodo)")
+        conn.commit()
+        conn.close()
+        st.rerun()
