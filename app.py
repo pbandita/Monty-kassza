@@ -61,7 +61,7 @@ if 'animated' not in st.session_state:
             st.markdown("<h1 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h1>", unsafe_allow_html=True)
             
             # Ide illeszthetsz bármilyen állatos/tappancsos GIF linket
-            gif_url = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueGZ3bmZqZzR3eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZ25vcmVkJmN0PWc/3o7TKMGpxVCElgS97a/giphy.gif"
+            gif_url = "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMzIyZTc1eTd2dDgxM2VuOHJrdHJjemRuemV4dm43bDA1dGp1ZXFwYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/U7xQEBePTRS6OVhY0H/giphy.gif"
             
             st.image(gif_url, use_container_width=True)
             
