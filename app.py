@@ -56,47 +56,18 @@ if 'animated' not in st.session_state:
             time.sleep(0.5)
             
     else:
-        # ZSÓKA ANIMÁCIÓ + TELJES KÉPERNYŐS INVÁZIÓ (JAVÍTOTT VERZIÓ)
+        # ZSÓKA GIF ANIMÁCIÓ
         with placeholder.container():
-            st.markdown("<h1 style='text-align:center; margin-top: 50px;'>🏰 A kastély kapui megnyílnak...</h1>", unsafe_allow_html=True)
+            st.markdown("<h1 style='text-align:center;'>🏰 A kastély kapui megnyílnak...</h1>", unsafe_allow_html=True)
             
-            nyomok = ["🐾", "🐎", "🦴", "🧶", "🦜", "🐈", "🐶", "👣", "✨", "🐣", "👟"]
-            kaosz_area = st.empty()
-            elemek_html = []
+            # Ide illeszthetsz bármilyen állatos/tappancsos GIF linket
+            gif_url = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueGZ3bmZqZzR3eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZ25vcmVkJmN0PWc/3o7TKMGpxVCElgS97a/giphy.gif"
             
-            for i in range(60):
-                nyom = random.choice(nyomok)
-                bal = random.randint(2, 95)
-                fent = random.randint(10, 80) 
-                meret = random.randint(35, 90)
-                fordulat = random.randint(-60, 60)
-                
-                # Itt a titok: minden elemet egy abszolút pozícionált div-be teszünk
-                uj_elem = f"""
-                <span style='
-                    position: fixed; 
-                    left: {bal}vw; 
-                    top: {fent}vh; 
-                    font-size: {meret}px; 
-                    transform: rotate({fordulat}deg);
-                    z-index: {9999 + i};
-                    pointer-events: none;
-                '>{nyom}</span>
-                """
-                elemek_html.append(uj_elem)
-                
-                # Összefűzzük az összes eddigi elemet
-                teljes_html = "".join(elemek_html)
-                
-                # A st.write helyett st.components.v1.html-t vagy sima st.markdown-t használunk, 
-                # de most egy burkoló div-be zárjuk az egészet
-                kaosz_area.markdown(f"<div>{teljes_html}</div>", unsafe_allow_html=True)
-                
-                wait_time = max(0.005, 0.12 - (i * 0.003))
-                time.sleep(wait_time)
+            st.image(gif_url, use_container_width=True)
             
-            st.markdown("<h2 style='text-align:center; position: relative; z-index: 10000;'>Üdvözlünk itthon, Zsóka!</h2>", unsafe_allow_html=True)
-            time.sleep(1.8)
+            time.sleep(3) # Ennyi ideig látszik a GIF
+            st.markdown("<h2 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h2>", unsafe_allow_html=True)
+            time.sleep(1.5)
             
     st.session_state.animated = True
     placeholder.empty()
