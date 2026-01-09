@@ -73,7 +73,7 @@ if 'animated' not in st.session_state:
             # A végén egy kis ugráló kutyus üdvözlésnek
             st.markdown("<div style='display: flex; justify-content: center;'><img src='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJic2t6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6bmZ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/5AtX86f3fDfyE/giphy.gif' width='150'></div>", unsafe_allow_html=True)
             st.markdown("<h3 style='text-align:center;'>Üdvözlünk itthon, Zsóka!</h3>", unsafe_allow_html=True)
-            time.sleep(1.2)
+            time.sleep(0.5)
 
 # --- USER SPECIFIKUS DESIGN ---
 user = st.session_state.user
