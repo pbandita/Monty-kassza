@@ -186,9 +186,9 @@ with tab1:
         st.subheader("🆕 Új tranzakció")
         with st.form("main_f", clear_on_submit=True):
             d = st.date_input("Dátum", datetime.now())
-            t = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel", "💰 Megtakarítás", "💵 Fizetés"])
+            t = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel", "💰 Megtakarítás", ])
             # NINCS NÉV VÁLASZTÓ - Automatikusan a 'user' változót használjuk lent
-            k = st.selectbox("Kategória", ["🏠 Lakás/Rezsi", "🛒 Élelmiszer", "🏦 Hitel", "🚗 Közlekedés", "🐶 Monty", "📦 Egyéb"])
+            k = st.selectbox("Kategória", [ "💵 Fizetés","🏠 Lakás/Rezsi", "🛒 Élelmiszer", "🏦 Hitel"," Egészségügy/Szépségápolás", "🚗 Közlekedés", "🐶 Monty", "📦 Egyéb"])
             
             v_c1, v_c2 = st.columns([1,2])
             valuta = v_c1.selectbox("Pénznem", ["HUF", "EUR"])
