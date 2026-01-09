@@ -47,13 +47,48 @@ if user == "👤 Andris":
         </style>
     """, unsafe_allow_html=True)
 else:
-    primary_color = "#f7f0e4" # Arany
-    bg_color = "#8B4513" # Halvány rózsaszín
+    # --- Színbeállítások Zsókának ---
+    primary_color = "#2E7D32" # Középzöld (Gombok és címek)
+    bg_color = "#1B5E20"      # Nagyon sötétzöld (Oldal háttér)
+    input_bg = "#388E3C"      # Világosabb zöld (A beviteli mezők belseje)
+    border_color = "#4CAF50"  # Élénkzöld (A külső keret színe)
+
     st.markdown(f"""
         <style>
-        .stApp {{ background-color: {bg_color}; color: #f7f0e4; }}
-        .stButton>button {{ background-color: #f7f0e4 !important; color: Black !important; border-radius: 20px !important; }}
-        h1, h2, h3 {{ color: #f7f0e4 !important; font-family: 'Palatino', serif !important; }}
+        
+        .stApp {{ 
+            background-color: {bg_color}; 
+            color: #FFFFFF;
+            border: 10px solid {border_color}; 
+            box-sizing: border-box;
+        }}
+
+        
+        input, div[data-baseweb="select"] > div, textarea, .stNumberInput input {{
+            background-color: {input_bg} !important;
+            color: white !important;
+            border: 1px solid {border_color} !important;
+            border-radius: 5px;
+        }}
+
+        
+        .stButton>button {{ 
+            background-color: {primary_color} !important; 
+            color: white !important; 
+            border-radius: 20px !important; 
+            border: 2px solid {border_color} !important;
+            font-weight: bold;
+        }}
+
+    
+        h1, h2, h3 {{ 
+            color: #C8E6C9 !important; /* Halványzöld a jobb olvashatóságért */
+            font-family: 'Georgia', serif; 
+        }}
+
+        /* 5. TÁBLÁZAT ÉS TABS SZÍNEK */
+        .stTabs [data-baseweb="tab"] {{ color: #FFFFFF !important; }}
+        .stDataFrame {{ background-color: {input_bg} !important; }}
         </style>
     """, unsafe_allow_html=True)
 
