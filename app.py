@@ -38,7 +38,6 @@ if 'animated' not in st.session_state:
     
     if st.session_state.user == "👤 Andris":
         with placeholder.container():
-            # A te már bevált terminálos betöltésed
             lines = [
                 "> BOOTING SYSTEM...",
                 "> CONNECTING TO SECURE DATABASE...",
@@ -61,20 +60,18 @@ if 'animated' not in st.session_state:
         with placeholder.container():
             st.markdown("<h1 style='text-align:center; margin-top: 50px;'>🏰 A kastély kapui megnyílnak...</h1>", unsafe_allow_html=True)
             
-            # Kibővített szimbólum készlet: tappancs, patkó, csont, gombolyag, madárnyom
+            # Kibővített szimbólum készlet
             nyomok = ["🐾", "🐎", "🦴", "🧶", "🦜", "🐈", "🐶", "👣", "✨", "🐣", "👟"]
             
             kaosz_area = st.empty()
             elemek_html = []
             
-            # 60 elemre emeltem a számot a sűrűbb hatásért
             for i in range(60):
                 nyom = random.choice(nyomok)
-                bal = random.randint(2, 95) # Teljes szélesség kihasználása
-                # A képernyő tetejétől az aljáig szórjuk (vh = viewport height)
+                bal = random.randint(2, 95)
                 fent = random.randint(10, 80) 
-                meret = random.randint(35, 90) # Kicsit nagyobb méretek
-                fordulat = random.randint(-60, 60) # Erősebb dőlésszög
+                meret = random.randint(35, 90)
+                fordulat = random.randint(-60, 60)
                 
                 uj_elem = f"""
                 <div style='
@@ -93,11 +90,9 @@ if 'animated' not in st.session_state:
                 """
                 elemek_html.append(uj_elem)
                 
-                # Kirajzoljuk az összes eddigi elemet
-                # A ciklus végén így legyen:
+                # JAVÍTVA: Mindig kell az unsafe_allow_html=True!
                 kaosz_area.markdown(f"<div>{''.join(elemek_html)}</div>", unsafe_allow_html=True)
                 
-                # Még gyorsabb tempó a végére
                 wait_time = max(0.005, 0.15 - (i * 0.004))
                 time.sleep(wait_time)
             
@@ -105,7 +100,27 @@ if 'animated' not in st.session_state:
             time.sleep(1.8)
 
     st.session_state.animated = True
-    placeholder.empty() # Itt takarítunk ki!
+    placeholder.empty()
+
+# --- ADATOK BETÖLTÉSE ---
+@st.cache_data(ttl=600)
+def get_rate():
+    try: return requests.get("https://open.er-api.com/v6/latest/EUR").json()['rates']['HUF']
+    except: return 410.0
+
+rate = get_rate()
+
+def load_data(url):
+    try:
+        r = requests.get(f"{url}&cb={datetime.now().timestamp()}")
+        df = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
+        # JAVÍTVA: Kényszerített kisbetűs oszlopnevek a 'datum' hiba ellen
+        df.columns = [c.strip().lower() for c in df.columns]
+        return df
+    except: return pd.DataFrame()
+
+df_main = load_data(CSV_URL_MAIN)
+df_fixek = load_data(CSV_URL_FIXEK)
 
 # --- USER SPECIFIKUS DESIGN ---
 user = st.session_state.user
@@ -146,29 +161,9 @@ else:
         </style>
     """, unsafe_allow_html=True)
 
-# --- ADATOK BETÖLTÉSE ---
-@st.cache_data(ttl=600)
-def get_rate():
-    try: return requests.get("https://open.er-api.com/v6/latest/EUR").json()['rates']['HUF']
-    except: return 410.0
-
-rate = get_rate()
-
-def load_data(url):
-    try:
-        r = requests.get(f"{url}&cb={datetime.now().timestamp()}")
-        df = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
-        df.columns = [c.strip().lower() for c in df.columns]
-        return df
-    except: return pd.DataFrame()
-
-df_main = load_data(CSV_URL_MAIN)
-df_fixek = load_data(CSV_URL_FIXEK)
-
 # --- FELÜLET ---
 st.title(f"{'⚡ TERMINÁL: ' if user == '👤 Andris' else '🏇 KASTÉLY: '} Üdvözlünk, {user}!")
 
-# Kijelentkezés a Sidebarba (így nem zavar be középen)
 if st.sidebar.button("🚪 Kijelentkezés"):
     for key in list(st.session_state.keys()):
         del st.session_state[key]
@@ -182,7 +177,7 @@ with tab1:
     with c1:
         st.subheader("🆕 Új tranzakció")
         with st.form("main_f", clear_on_submit=True):
-            d = st.date_input("Dátum", datetime.now())
+            d = st.date_input("Dátum", datetime.today())
             t = st.selectbox("Típus", ["📉 Kiadás", "📈 Bevétel", "💰 Megtakarítás"])
             k = st.selectbox("Kategória", ["💵 Fizetés","🏠 Lakás/Rezsi", "🛒 Élelmiszer", "🏦 Hitel", "Egészségügy/Szépségápolás", "🚗 Közlekedés", "🐶 Monty", "📦 Egyéb"])
             v_c1, v_c2 = st.columns([1,2])
@@ -193,6 +188,7 @@ with tab1:
                 final = int(osszeg if valuta == "HUF" else osszeg * rate)
                 requests.post(SCRIPT_URL, json={"is_fix": False, "datum": str(d), "tipus": t, "szemely": user, "kategoria": k, "osszeg": final, "megjegyzes": megj})
                 st.success("Sikeres mentés!")
+                st.cache_data.clear()
                 st.rerun()
 
     with c2:
@@ -201,10 +197,11 @@ with tab1:
             f_nev = st.text_input("Fix kiadás neve")
             f_kat = st.selectbox("Kategória", ["🏠 Lakás/Rezsi", "🏦 Hitel", "💰 Megtakarítás", "📦 Egyéb"])
             f_osszeg = st.number_input("HUF", min_value=0)
-            f_d = st.date_input("Nap", datetime.now())
+            f_d = st.date_input("Nap", datetime.today())
             if st.form_submit_button("Rögzítés"):
                 requests.post(SCRIPT_URL, json={"is_fix":True, "nev":f_nev, "kategoria":f_kat, "osszeg":int(f_osszeg), "datum":str(f_d)})
                 st.success("Fix tétel ütemezve!")
+                st.cache_data.clear()
                 st.rerun()
 
 with tab2:
@@ -214,24 +211,30 @@ with tab2:
         if not kiadas_df.empty:
             c_a, c_b = st.columns(2)
             pie_color = px.colors.sequential.Greens if user == "👤 Andris" else px.colors.sequential.RdPu
-            with c_a: st.plotly_chart(px.pie(kiadas_df, values='osszeg', names='kategoria', title="Kiadások", color_discrete_sequence=pie_color), use_container_width=True)
+            with c_a: st.plotly_chart(px.pie(kiadas_df, values='osszeg', names='kategoria', title="Kiadások megoszlása", color_discrete_sequence=pie_color), use_container_width=True)
             with c_b:
-                kiadas_df['honap'] = pd.to_datetime(kiadas_df['datum']).dt.strftime('%Y-%m')
-                st.plotly_chart(px.line(kiadas_df.groupby('honap')['osszeg'].sum().reset_index(), x='honap', y='osszeg', title="Havi trend"), use_container_width=True)
+                if 'datum' in kiadas_df.columns:
+                    kiadas_df['honap'] = pd.to_datetime(kiadas_df['datum']).dt.strftime('%Y-%m')
+                    trend = kiadas_df.groupby('honap')['osszeg'].sum().reset_index()
+                    st.plotly_chart(px.line(trend, x='honap', y='osszeg', title="Havi trend"), use_container_width=True)
 
 with tab3:
     st.write("**Tranzakcióid naplója:**")
     if not df_main.empty:
-        st.dataframe(df_main.head(30), use_container_width=True)
+        # JAVÍTVA: Datum alapú sorbarendezés, ha létezik az oszlop
+        display_df = df_main.copy()
+        if 'datum' in display_df.columns:
+            display_df = display_df.sort_values('datum', ascending=False)
+        st.dataframe(display_df.head(50), use_container_width=True)
+        
         st.divider()
         st.subheader("🗑️ Sor törlése")
-        row_to_delete = st.number_input("Törlendő sor indexe:", min_value=0, max_value=len(df_main)-1, step=1)
+        row_to_delete = st.number_input("Törlendő sor indexe (a táblázat bal szélső száma):", min_value=0, step=1)
         if st.button("❌ VÉGLEGES TÖRLÉS"):
             res = requests.post(SCRIPT_URL, json={"action": "delete", "row_index": int(row_to_delete)})
-            if "Törlés" in res.text or res.status_code == 200:
-                st.success("Törölve!")
-                st.cache_data.clear()
-                st.rerun()
+            st.success("Törlési kérelem elküldve!")
+            st.cache_data.clear()
+            st.rerun()
     else:
         st.info("Üres a táblázat.")
 
